@@ -1,0 +1,60 @@
+<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Document Background -->
+  <rect width="300" height="400" fill="#ffffff" stroke="#e0e0e0" stroke-width="2" rx="8"/>
+  
+  <!-- Header with Seal -->
+  <circle cx="150" cy="40" r="25" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <text x="150" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#333">SEAL</text>
+  
+  <text x="150" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">CERTIFICATE OF LIVE BIRTH</text>
+  <text x="150" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#666">Republic of the Philippines</text>
+  <text x="150" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#666">Philippine Statistics Authority</text>
+  
+  <!-- Child Information -->
+  <rect x="20" y="120" width="260" height="25" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="25" y="135" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">CHILD INFORMATION</text>
+  
+  <text x="25" y="155" font-family="Arial, sans-serif" font-size="9" fill="#333">Name:</text>
+  <text x="70" y="155" font-family="Arial, sans-serif" font-size="9" fill="#666">[Child's Full Name]</text>
+  
+  <text x="25" y="170" font-family="Arial, sans-serif" font-size="9" fill="#333">Sex:</text>
+  <text x="50" y="170" font-family="Arial, sans-serif" font-size="9" fill="#666">[Male/Female]</text>
+  <text x="150" y="170" font-family="Arial, sans-serif" font-size="9" fill="#333">Date of Birth:</text>
+  <text x="220" y="170" font-family="Arial, sans-serif" font-size="9" fill="#666">[MM/DD/YYYY]</text>
+  
+  <text x="25" y="185" font-family="Arial, sans-serif" font-size="9" fill="#333">Place of Birth:</text>
+  <text x="95" y="185" font-family="Arial, sans-serif" font-size="9" fill="#666">[City, Province]</text>
+  
+  <!-- Parents Information -->
+  <rect x="20" y="200" width="260" height="25" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="25" y="215" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">PARENTS INFORMATION</text>
+  
+  <text x="25" y="235" font-family="Arial, sans-serif" font-size="9" fill="#333">Father's Name:</text>
+  <text x="100" y="235" font-family="Arial, sans-serif" font-size="9" fill="#666">[Father's Full Name]</text>
+  
+  <text x="25" y="250" font-family="Arial, sans-serif" font-size="9" fill="#333">Mother's Name:</text>
+  <text x="100" y="250" font-family="Arial, sans-serif" font-size="9" fill="#666">[Mother's Full Name]</text>
+  
+  <text x="25" y="265" font-family="Arial, sans-serif" font-size="9" fill="#333">Citizenship:</text>
+  <text x="85" y="265" font-family="Arial, sans-serif" font-size="9" fill="#666">[Filipino]</text>
+  
+  <!-- Registration Information -->
+  <rect x="20" y="280" width="260" height="25" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="25" y="295" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">REGISTRATION INFORMATION</text>
+  
+  <text x="25" y="315" font-family="Arial, sans-serif" font-size="9" fill="#333">Registry No:</text>
+  <text x="90" y="315" font-family="Arial, sans-serif" font-size="9" fill="#666">[Registration Number]</text>
+  
+  <text x="25" y="330" font-family="Arial, sans-serif" font-size="9" fill="#333">Date Registered:</text>
+  <text x="115" y="330" font-family="Arial, sans-serif" font-size="9" fill="#666">[MM/DD/YYYY]</text>
+  
+  <!-- Certification -->
+  <text x="25" y="355" font-family="Arial, sans-serif" font-size="8" fill="#666">This certifies that the foregoing is a true copy of an entry</text>
+  <text x="25" y="367" font-family="Arial, sans-serif" font-size="8" fill="#666">in the Register of Births for the above-named child.</text>
+  
+  <!-- Footer -->
+  <text x="150" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#999">Sample Birth Certificate</text>
+  
+  <!-- Watermark -->
+  <text x="150" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#f0f0f0" opacity="0.3" transform="rotate(-45 150 200)">SAMPLE</text>
+</svg>

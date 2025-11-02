@@ -1,0 +1,16 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <text x="200" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#495057">CERTIFICATE OF RATING</text>
+  <text x="200" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6c757d">Sample Document</text>
+  
+  <text x="30" y="110" font-family="Arial, sans-serif" font-size="12" fill="#495057">Certificate No: _______________</text>
+  <text x="30" y="130" font-family="Arial, sans-serif" font-size="12" fill="#495057">Date Issued: _______________</text>
+  
+  <text x="30" y="160" font-family="Arial, sans-serif" font-size="12" fill="#495057">This certifies that:</text>
+  <text x="30" y="180" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#495057">_________________________</text>
+  <text x="30" y="200" font-family="Arial, sans-serif" font-size="12" fill="#495057">has obtained the following rating:</text>
+  
+  <text x="30" y="230" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#495057">Rating: _______________</text>
+  
+  <text x="30" y="260" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">Authorized Signature</text>
+</svg>

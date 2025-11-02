@@ -1,0 +1,30 @@
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- ID Card Background -->
+  <rect width="300" height="200" fill="#ffffff" stroke="#e0e0e0" stroke-width="2" rx="12"/>
+  
+  <!-- Header -->
+  <rect x="10" y="10" width="280" height="30" fill="#059669" rx="6"/>
+  <text x="150" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">GUARDIAN'S VALID ID</text>
+  
+  <!-- Photo Area -->
+  <rect x="20" y="50" width="60" height="80" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1" rx="4"/>
+  <text x="50" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">PHOTO</text>
+  <text x="50" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">2x2</text>
+  
+  <!-- Personal Information -->
+  <text x="95" y="65" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">ID Number:</text>
+  <text x="95" y="80" font-family="Arial, sans-serif" font-size="9" fill="#666">[Guardian's ID Number]</text>
+  
+  <text x="95" y="100" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">Full Name:</text>
+  <text x="95" y="115" font-family="Arial, sans-serif" font-size="9" fill="#666">[Guardian's Full Name]</text>
+  
+  <text x="95" y="135" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">Date of Birth:</text>
+  <text x="95" y="150" font-family="Arial, sans-serif" font-size="9" fill="#666">[MM/DD/YYYY]</text>
+  
+  <!-- Footer Information -->
+  <text x="20" y="170" font-family="Arial, sans-serif" font-size="8" fill="#666">Address: [Guardian's Complete Address]</text>
+  <text x="20" y="185" font-family="Arial, sans-serif" font-size="8" fill="#666">Valid Until: [Expiration Date]</text>
+  
+  <!-- Sample Watermark -->
+  <text x="150" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#f0f0f0" opacity="0.4" transform="rotate(-20 150 120)">SAMPLE</text>
+</svg>

@@ -1,0 +1,61 @@
+<svg width="300" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Document Background -->
+  <rect width="300" height="400" fill="#ffffff" stroke="#e0e0e0" stroke-width="2" rx="8"/>
+  
+  <!-- Header -->
+  <rect x="10" y="10" width="280" height="60" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="150" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">TRANSCRIPT OF RECORDS</text>
+  <text x="150" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">Official Academic Record</text>
+  
+  <!-- Student Info Section -->
+  <text x="20" y="90" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#333">Student Information:</text>
+  <text x="20" y="110" font-family="Arial, sans-serif" font-size="10" fill="#666">Name: [Student Full Name]</text>
+  <text x="20" y="125" font-family="Arial, sans-serif" font-size="10" fill="#666">Student ID: [Student Number]</text>
+  <text x="20" y="140" font-family="Arial, sans-serif" font-size="10" fill="#666">Program: [Course/Program Name]</text>
+  
+  <!-- Academic Records Table Header -->
+  <rect x="20" y="160" width="260" height="25" fill="#e9ecef" stroke="#dee2e6" stroke-width="1"/>
+  <text x="30" y="175" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#333">Subject Code</text>
+  <text x="120" y="175" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#333">Subject Title</text>
+  <text x="220" y="175" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#333">Grade</text>
+  <text x="260" y="175" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#333">Units</text>
+  
+  <!-- Sample Academic Records -->
+  <rect x="20" y="185" width="260" height="20" fill="#ffffff" stroke="#dee2e6" stroke-width="1"/>
+  <text x="30" y="198" font-family="Arial, sans-serif" font-size="8" fill="#666">MATH101</text>
+  <text x="120" y="198" font-family="Arial, sans-serif" font-size="8" fill="#666">College Algebra</text>
+  <text x="230" y="198" font-family="Arial, sans-serif" font-size="8" fill="#666">1.25</text>
+  <text x="265" y="198" font-family="Arial, sans-serif" font-size="8" fill="#666">3</text>
+  
+  <rect x="20" y="205" width="260" height="20" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  <text x="30" y="218" font-family="Arial, sans-serif" font-size="8" fill="#666">ENG101</text>
+  <text x="120" y="218" font-family="Arial, sans-serif" font-size="8" fill="#666">English Communication</text>
+  <text x="230" y="218" font-family="Arial, sans-serif" font-size="8" fill="#666">1.50</text>
+  <text x="265" y="218" font-family="Arial, sans-serif" font-size="8" fill="#666">3</text>
+  
+  <rect x="20" y="225" width="260" height="20" fill="#ffffff" stroke="#dee2e6" stroke-width="1"/>
+  <text x="30" y="238" font-family="Arial, sans-serif" font-size="8" fill="#666">SCI101</text>
+  <text x="120" y="238" font-family="Arial, sans-serif" font-size="8" fill="#666">General Biology</text>
+  <text x="230" y="238" font-family="Arial, sans-serif" font-size="8" fill="#666">1.75</text>
+  <text x="265" y="238" font-family="Arial, sans-serif" font-size="8" fill="#666">3</text>
+  
+  <!-- More rows indicator -->
+  <text x="150" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#999">... additional subjects ...</text>
+  
+  <!-- GPA Section -->
+  <rect x="20" y="280" width="260" height="30" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="30" y="295" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">General Weighted Average (GWA):</text>
+  <text x="250" y="295" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">1.50</text>
+  <text x="30" y="305" font-family="Arial, sans-serif" font-size="9" fill="#666">Total Units Earned: 90</text>
+  
+  <!-- School Info -->
+  <text x="20" y="335" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">Issued by:</text>
+  <text x="20" y="350" font-family="Arial, sans-serif" font-size="9" fill="#666">[Previous School Name]</text>
+  <text x="20" y="365" font-family="Arial, sans-serif" font-size="9" fill="#666">[School Address]</text>
+  
+  <!-- Footer -->
+  <text x="150" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#999">This is a sample TOR format</text>
+  
+  <!-- Watermark -->
+  <text x="150" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#f0f0f0" opacity="0.3" transform="rotate(-45 150 200)">SAMPLE</text>
+</svg>

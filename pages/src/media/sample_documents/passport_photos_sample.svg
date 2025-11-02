@@ -1,0 +1,31 @@
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="300" height="200" fill="#ffffff" stroke="#e0e0e0" stroke-width="2" rx="8"/>
+  
+  <!-- Header -->
+  <text x="150" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#333">PASSPORT-SIZE PICTURES</text>
+  <text x="150" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#666">(2x2 inches, White Background)</text>
+  
+  <!-- Photo 1 -->
+  <rect x="60" y="60" width="50" height="60" fill="#f8f9fa" stroke="#d1d5db" stroke-width="2" rx="4"/>
+  <rect x="65" y="75" width="40" height="30" fill="#e5e7eb" stroke="#d1d5db" stroke-width="1" rx="20"/>
+  <text x="85" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">PHOTO</text>
+  <rect x="75" y="105" width="20" height="10" fill="#e5e7eb" stroke="#d1d5db" stroke-width="1" rx="2"/>
+  <text x="85" y="135" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#666">2x2</text>
+  
+  <!-- Photo 2 -->
+  <rect x="190" y="60" width="50" height="60" fill="#f8f9fa" stroke="#d1d5db" stroke-width="2" rx="4"/>
+  <rect x="195" y="75" width="40" height="30" fill="#e5e7eb" stroke="#d1d5db" stroke-width="1" rx="20"/>
+  <text x="215" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">PHOTO</text>
+  <rect x="205" y="105" width="20" height="10" fill="#e5e7eb" stroke="#d1d5db" stroke-width="1" rx="2"/>
+  <text x="215" y="135" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#666">2x2</text>
+  
+  <!-- Requirements -->
+  <text x="30" y="155" font-family="Arial, sans-serif" font-size="8" fill="#666">Requirements:</text>
+  <text x="30" y="170" font-family="Arial, sans-serif" font-size="7" fill="#666">• White background</text>
+  <text x="30" y="182" font-family="Arial, sans-serif" font-size="7" fill="#666">• Recent photos (not older than 6 months)</text>
+  <text x="30" y="194" font-family="Arial, sans-serif" font-size="7" fill="#666">• Clear, front-facing view</text>
+  
+  <!-- Sample Watermark -->
+  <text x="150" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#f0f0f0" opacity="0.4" transform="rotate(-20 150 110)">SAMPLE</text>
+</svg>
