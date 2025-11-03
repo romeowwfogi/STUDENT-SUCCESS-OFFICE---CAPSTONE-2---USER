@@ -519,6 +519,3 @@
     });
   })();
 </script>
-    // Initialize inputs with defaults if present
-    if (nameInput && defaultName) nameInput.value = defaultName;
-    if (emailInput && defaultEmail) emailInput.value = defaultEmail;

@@ -9,7 +9,7 @@ $ACCOUNT_ID = isset($_SESSION['user_id']) ? base64_decode($_SESSION['user_id']) 
 if (!$sessionToken || !$ACCOUNT_ID) {
     header('Content-Type: application/json');
     http_response_code(401);
-    echo json_encode(["success" => false, "message" => "Unauthorized access."]); 
+    echo json_encode(["success" => false, "message" => "Unauthorized access."]);
     exit;
 }
 
@@ -20,7 +20,7 @@ if (strpos($sessionToken, 'Bearer ') === 0) {
 } else {
     header('Content-Type: application/json');
     http_response_code(401);
-    echo json_encode(["success" => false, "message" => "Invalid session token format."]); 
+    echo json_encode(["success" => false, "message" => "Invalid session token format."]);
     exit;
 }
 
@@ -35,7 +35,7 @@ if ($conn && !$conn->connect_error) {
     if (!$result['success'] || count($result['data']) === 0) {
         header('Content-Type: application/json');
         http_response_code(401);
-        echo json_encode(["success" => false, "message" => "Session expired or invalid."]); 
+        echo json_encode(["success" => false, "message" => "Session expired or invalid."]);
         exit;
     }
 }
@@ -46,13 +46,16 @@ $password = $_SESSION['password'] ?? '';
 if (!$email || !$password) {
     header('Content-Type: application/json');
     http_response_code(401);
-    echo json_encode(["success" => false, "message" => "Missing credentials in session."]); 
+    echo json_encode(["success" => false, "message" => "Missing credentials in session."]);
     exit;
 }
 
 // Read URL (the file to preview from external API storage)
 $url = $_GET['url'] ?? '';
 $url = trim($url);
+// Frontend may send the URL fully percent-encoded via encodeURIComponent
+// Decode here so parse_url can understand it
+$url = rawurldecode($url);
 if (!$url) {
     header('Content-Type: application/json');
     http_response_code(400);
@@ -61,25 +64,37 @@ if (!$url) {
 }
 
 // Normalize and validate path (handle encoded spaces and alternate base)
+$parsed = parse_url($url);
+if (!$parsed || !isset($parsed['path'])) {
+    header('Content-Type: application/json');
+    http_response_code(400);
+    echo json_encode(["success" => false, "message" => "Invalid URL format."]);
+    exit;
+}
+
 $path = $parsed['path'] ?? '';
 $decodedPath = rawurldecode($path);
 
-// If CAPSTONE path, rewrite to api uploads path for external preview service
-if ($isCapstoneUploads) {
-    $uploadsPos = strpos($decodedPath, '/uploads/requirements/');
-    $tail = $uploadsPos !== false ? substr($decodedPath, $uploadsPos) : '';
-    if (!$tail) {
-        header('Content-Type: application/json');
-        http_response_code(400);
-        echo json_encode(["success" => false, "message" => "Invalid file path."]); 
-        exit;
+// If path points under uploads/requirements, standardize to configured base URL
+$uploadsPos = strpos($decodedPath, '/uploads/requirements/');
+if ($uploadsPos !== false) {
+    $tail = substr($decodedPath, $uploadsPos);
+    if (isset($UPLOAD_REQUIREMENTS_BASE_URL) && $UPLOAD_REQUIREMENTS_BASE_URL) {
+        $hostBase = rtrim($UPLOAD_REQUIREMENTS_BASE_URL, '/') . '/';
+        $safeBase = str_replace(' ', '%20', $hostBase);
+        $url = $safeBase . ltrim($tail, '/');
     }
-    // Build normalized URL with encoded spaces in base
-    $url = 'http://localhost/STUDENT%20SUCCESS%20OFFICE%20-%20api/' . ltrim($tail, '/');
 }
 
-// Build request to external preview API
-$externalEndpoint = 'http://localhost/STUDENT%20SUCCESS%20OFFICE%20-%20api/preview-requirement.php';
+// Build request to external preview API from configuration
+if (!isset($PREVIEW_REQUIREMENTS_URL) || !$PREVIEW_REQUIREMENTS_URL) {
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "Preview API URL is not configured."]);
+    exit;
+}
+
+$externalEndpoint = $PREVIEW_REQUIREMENTS_URL;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $externalEndpoint);

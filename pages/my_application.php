@@ -1023,7 +1023,6 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
 
         .file_actions a {
             font-size: 13px;
-            color: #2563eb;
             text-decoration: none;
         }
 
@@ -1098,12 +1097,27 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
         }
 
         .preview-modal-body {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
+            padding: 0;
+            display: block;
+            min-height: 60vh;
             background: #fff;
+            overflow: hidden;
+        }
+
+        /* Ensure embedded previews fill the modal neatly */
+        .preview-modal-body iframe,
+        .preview-modal-body object {
+            width: 100%;
+            height: 80vh;
+            border: 0;
+            display: block;
+        }
+
+        .preview-modal-body img {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            margin: 0 auto;
         }
 
         .preview-loading {
@@ -1112,6 +1126,20 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
 
         .preview-error {
             color: #dc2626;
+        }
+
+        /* Readable text preview */
+        .preview-text {
+            max-height: 80vh;
+            overflow: auto;
+            padding: 16px;
+            margin: 0;
+            line-height: 1.45;
+            background: #fafafa;
+            border-left: 4px solid #e5e7eb;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
 
         @media (max-width: 768px) {
@@ -1663,7 +1691,6 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
                     chips.push(`<span class="meta_chip">Academic Year: ${submission.academic_year || 'N/A'}</span>`);
                     chips.push(`<span class="meta_chip">Type: ${submission.type || 'N/A'}</span>`);
                     if (submission.submitted_at) chips.push(`<span class="meta_chip">Submitted: ${submission.submitted_at}</span>`);
-                    if (submission.remarks) chips.push(`<span class="meta_chip">Remarks: ${submission.remarks}</span>`);
                     viewModalMeta.innerHTML = chips.join('');
 
                     // Application Status section (Status and Remarks)
@@ -1696,10 +1723,27 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
                         // Make link relative to pages dir if path is root-relative
                         const href = path ? (path.startsWith('http') ? path : `../${path}`) : '#';
                         const safeHref = href;
+                        const lowerName = (name || '').toLowerCase();
+                        const lowerPath = (path || '').toLowerCase();
+                        const extMatch = lowerName.match(/\.([a-z0-9]+)$/) || lowerPath.match(/\.([a-z0-9]+)(?:[?#]|$)/);
+                        const ext = extMatch ? extMatch[1] : '';
+                        const previewable = [
+                            // Images
+                            'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico',
+                            // Documents
+                            'pdf', 'txt', 'md', 'csv',
+                            // Web/code
+                            'html', 'htm', 'css', 'js', 'xml', 'json',
+                            // Audio/video (browser-dependent)
+                            'mp3', 'wav', 'ogg', 'mp4', 'webm', 'ogv'
+                        ].includes(ext);
+                        const actionHtml = previewable ?
+                            `<button class="btn btn_primary" data-preview-url="${safeHref}" data-preview-name="${name}">Preview</button>` :
+                            `<a class="btn btn_primary" href="${safeHref}" download>Download</a>`;
                         return `<div class="file_item">
                                     <div class="file_name">${name}</div>
                                     <div class="file_actions">
-                                        <button class="btn btn_primary" data-preview-url="${safeHref}" data-preview-name="${name}">Preview</button>
+                                        ${actionHtml}
                                     </div>
                                 </div>`;
                     }).join('');
@@ -1974,11 +2018,24 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
                         const name = f.original_filename || f.field_name || `File ${idx+1}`;
                         const path = f.file_path || '';
                         const safePath = path ? (path.startsWith('http') ? path : `../${path}`) : '';
+                        const lowerName = (name || '').toLowerCase();
+                        const lowerPath = (path || '').toLowerCase();
+                        const extMatch = lowerName.match(/\.([a-z0-9]+)$/) || lowerPath.match(/\.([a-z0-9]+)(?:[?#]|$)/);
+                        const ext = extMatch ? extMatch[1] : '';
+                        const previewable = [
+                            'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico',
+                            'pdf', 'txt', 'md', 'csv',
+                            'html', 'htm', 'css', 'js', 'xml', 'json',
+                            'mp3', 'wav', 'ogg', 'mp4', 'webm', 'ogv'
+                        ].includes(ext);
+                        const actionHtml = previewable ?
+                            `<button type="button" class="btn btn_secondary preview_existing" data-preview-url="${safePath}" ${safePath ? '' : 'disabled'}>Preview</button>` :
+                            `<a class="btn btn_secondary" href="${safePath}" download ${safePath ? '' : 'disabled'}>Download</a>`;
                         return `<div class="file_item">
                                     <div class="file_name">${name}</div>
                                     <div class="file_actions">
                                         <input type="file" class="file_replace_input" data-file-url="${path}" data-field-name="${f.field_name || ''}" accept="*/*">
-                                        <button type="button" class="btn btn_secondary preview_existing" data-preview-url="${safePath}" ${safePath ? '' : 'disabled'}>Preview</button>
+                                        ${actionHtml}
                                     </div>
                                 </div>`;
                     }).join('');
@@ -2012,17 +2069,6 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
                                 parent.classList.add('pending');
                                 const actions = parent.querySelector('.file_actions');
                                 let tag = parent.querySelector('.pending_tag');
-                                if (!tag) {
-                                    tag = document.createElement('span');
-                                    tag.className = 'pending_tag';
-                                    tag.style.marginLeft = '8px';
-                                    tag.style.fontSize = '12px';
-                                    tag.style.color = '#2563eb';
-                                    tag.textContent = 'Will replace on save';
-                                    if (actions) actions.appendChild(tag);
-                                } else {
-                                    tag.textContent = 'Will replace on save';
-                                }
                             }
                         });
                     });
@@ -2079,27 +2125,82 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
                     saveBtn.disabled = true;
                     saveBtn.textContent = 'Saving...';
                 }
+                // Perform API requests for data fields and file replacements
+                const ops = [];
 
-                // All API requests in Edit action are disabled/removed
-                const changedFieldsCount = changes.length;
-                const pendingFilesCount = Array.isArray(pendingFileReplacements) ? pendingFileReplacements.length : 0;
-                const summaryText = (() => {
-                    const parts = [];
-                    if (changedFieldsCount > 0) parts.push(`${changedFieldsCount} field(s) changed`);
-                    if (pendingFilesCount > 0) parts.push(`${pendingFilesCount} file(s) queued`);
-                    return parts.length > 0 ? parts.join(', ') : 'No modifications detected';
-                })();
+                // Update submission data fields
+                if (changes.length > 0) {
+                    ops.push(
+                        fetch('../api/update_submission_data.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                submission_id: currentEditSubmissionId,
+                                fields: changes
+                            })
+                        }).then(r => r.json()).catch(err => ({
+                            success: false,
+                            message: err && err.message ? err.message : 'Network error'
+                        }))
+                    );
+                }
 
-                const messageText = `Edit action is currently disabled. No server updates were performed.\n\nSummary: ${summaryText}`;
+                // Replace uploaded files via proxy
+                const REQUIREMENTS_BASE = '<?php echo addslashes($UPLOAD_REQUIREMENTS_BASE_URL ?? ""); ?>';
+                const fileResultsMap = new Map();
+                (pendingFileReplacements || []).forEach(rep => {
+                    const form = new FormData();
+                    // Build full URL for proxy if original is relative
+                    let urlForProxy = rep.url || '';
+                    if (urlForProxy && !/^https?:\/\//i.test(urlForProxy)) {
+                        const base = REQUIREMENTS_BASE || '';
+                        if (base) {
+                            urlForProxy = base.replace(/\/+$/, '') + '/' + urlForProxy.replace(/^\/+/, '');
+                        }
+                    }
+                    form.append('url', urlForProxy);
+                    form.append('file', rep.file);
+                    ops.push(
+                        fetch('../api/update_requirement_proxy.php', {
+                            method: 'POST',
+                            body: form
+                        }).then(r => r.json()).then(json => {
+                            fileResultsMap.set(rep.url, json);
+                            return json;
+                        }).catch(err => ({
+                            success: false,
+                            message: err && err.message ? err.message : 'Network error'
+                        }))
+                    );
+                });
+
+                const results = await Promise.all(ops);
+                const dataRes = results.find(r => r && (r.updated !== undefined || r.message === 'Data updated')) || null;
+                const fileResList = results.filter(r => r && r.db_updates);
+                const fieldsUpdated = dataRes && typeof dataRes.updated === 'number' ? dataRes.updated : 0;
+                const dbRowsChanged = fileResList.reduce((acc, r) => acc + ((r.db_updates && (r.db_updates.requirements_uploads_updated || 0)) + (r.db_updates && (r.db_updates.submission_files_updated || 0))), 0);
+
+                // Count successful file replacements regardless of DB row changes
+                const replacementsSucceeded = (pendingFileReplacements || []).reduce((count, rep) => {
+                    const res = fileResultsMap.get(rep.url);
+                    return count + (res && res.success === true ? 1 : 0);
+                }, 0);
+
+                const anyFailure = results.some(r => r && r.success === false);
+                const title = anyFailure ? 'Update Failed' : 'Update Success';
+                const msg = `Updated ${fieldsUpdated} field(s) successfully. Files replaced: ${replacementsSucceeded}`;
 
                 if (typeof messageModalV1Show === 'function') {
                     messageModalV1Show({
-                        icon: `<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' width='28' height='28'><path stroke-linecap='round' stroke-linejoin='round' d='M11.25 9V5.25m0 0L9 7.5m2.25-2.25l2.25 2.25M12 9v6m0 0H6m6 0h6' /></svg>`,
-                        iconBg: '#f3f4f6',
-                        actionBtnBg: '#2563eb',
+                        icon: `<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' width='28' height='28'><path stroke-linecap='round' stroke-linejoin='round' d='M4.5 12.75l6 6 9-13.5' /></svg>`,
+                        iconBg: anyFailure ? '#fef3c7' : '#dcfce7',
+                        actionBtnBg: anyFailure ? '#f59e0b' : '#16a34a',
                         showCancelBtn: false,
-                        title: 'Edit Disabled',
-                        message: messageText,
+                        title,
+                        message: msg,
                         cancelText: 'Cancel',
                         actionText: 'OK',
                         onConfirm: () => {
@@ -2108,7 +2209,7 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
                         }
                     });
                 } else {
-                    alert(messageText);
+                    alert(msg);
                     pendingFileReplacements = [];
                     closeEditModal();
                 }
@@ -2183,70 +2284,105 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
             } catch (_) {}
 
             const proxyUrl = `../api/preview_requirement_proxy.php?url=${encodeURIComponent(absoluteUrl)}`;
-
             fetch(proxyUrl)
                 .then(async (res) => {
-                    const ct = (res.headers.get('Content-Type') || '').toLowerCase();
                     if (!res.ok) {
-                        let msg = `Unable to preview file. (${res.status})`;
-                        if (ct.includes('application/json')) {
-                            try {
-                                const data = await res.json();
-                                msg = data.message || msg;
-                            } catch (_) {}
-                        }
-                        throw new Error(msg);
+                        throw new Error(`Unable to preview file. (${res.status})`);
                     }
+
+                    const ct = (res.headers.get('Content-Type') || '').toLowerCase();
                     const blob = await res.blob();
-                    const blobUrl = URL.createObjectURL(blob);
-                    previewModalBody._blobUrl = blobUrl;
                     previewModalBody.innerHTML = '';
 
-                    // Fallback type detection by extension if Content-Type is generic/missing
-                    const lowerName = (name || '').toLowerCase();
-                    const lowerUrl = (absoluteUrl || '').toLowerCase();
-                    const extMatch = lowerName.match(/\.([a-z0-9]+)$/) || lowerUrl.match(/\.([a-z0-9]+)(?:[?#]|$)/);
-                    const ext = extMatch ? extMatch[1] : '';
-                    const isImage = ct.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
-                    const isPdf = ct.includes('pdf') || ext === 'pdf';
+                    // Derive extension for extra hints
+                    let ext = '';
+                    try {
+                        const urlLower = (fileUrl || '').toLowerCase();
+                        const nameLower = (name || '').toLowerCase();
+                        const m = nameLower.match(/\.([a-z0-9]+)$/) || urlLower.match(/\.([a-z0-9]+)(?:[?#]|$)/);
+                        ext = m ? m[1] : '';
+                    } catch (_) {}
 
-                    if (isImage) {
+                    // Helper to attach text preview
+                    const renderText = async () => {
+                        const text = await blob.text();
+                        const pre = document.createElement('pre');
+                        pre.className = 'preview-text';
+                        pre.textContent = text;
+                        previewModalBody.appendChild(pre);
+                    };
+
+                    // Images (including svg/ico)
+                    if (ct.startsWith('image/') || ext === 'svg' || ext === 'ico') {
+                        const blobUrl = URL.createObjectURL(blob);
+                        previewModalBody._blobUrl = blobUrl;
                         const img = document.createElement('img');
                         img.src = blobUrl;
-                        img.alt = name;
-                        img.style.maxWidth = '100%';
-                        img.style.maxHeight = '75vh';
-                        img.style.borderRadius = '8px';
-                        img.style.boxShadow = '0 4px 8px rgba(0,0,0,0.08)';
+                        img.alt = name || 'preview';
                         previewModalBody.appendChild(img);
-                    } else if (isPdf) {
-                        // Prefer <object> for broader PDF support; fallback will display a download link only if embed fails
+                        return;
+                    }
+
+                    // PDF
+                    if (ct.includes('pdf') || ext === 'pdf') {
+                        const blobUrl = URL.createObjectURL(blob);
+                        previewModalBody._blobUrl = blobUrl;
                         const object = document.createElement('object');
                         object.data = blobUrl;
                         object.type = 'application/pdf';
-                        object.style.width = '100%';
-                        object.style.height = '75vh';
-                        const fallback = document.createElement('div');
-                        const dl = document.createElement('a');
-                        dl.href = blobUrl;
-                        dl.download = name || 'document.pdf';
-                        dl.className = 'btn btn_primary';
-                        dl.textContent = 'Download PDF';
-                        fallback.appendChild(dl);
-                        object.appendChild(fallback);
                         previewModalBody.appendChild(object);
-                    } else {
-                        // Unknown type: provide download only
-                        const link = document.createElement('a');
-                        link.href = blobUrl;
-                        link.download = name || 'download';
-                        link.className = 'btn btn_primary';
-                        link.textContent = 'Download file';
-                        previewModalBody.appendChild(link);
+                        return;
                     }
+
+                    // Audio
+                    if (ct.startsWith('audio/') || ['mp3', 'wav', 'ogg'].includes(ext)) {
+                        const blobUrl = URL.createObjectURL(blob);
+                        previewModalBody._blobUrl = blobUrl;
+                        const audio = document.createElement('audio');
+                        audio.controls = true;
+                        audio.src = blobUrl;
+                        audio.style.width = '100%';
+                        previewModalBody.appendChild(audio);
+                        return;
+                    }
+
+                    // Video
+                    if (ct.startsWith('video/') || ['mp4', 'webm', 'ogv', 'ogg'].includes(ext)) {
+                        const blobUrl = URL.createObjectURL(blob);
+                        previewModalBody._blobUrl = blobUrl;
+                        const video = document.createElement('video');
+                        video.controls = true;
+                        video.src = blobUrl;
+                        video.style.width = '100%';
+                        video.style.maxHeight = '80vh';
+                        previewModalBody.appendChild(video);
+                        return;
+                    }
+
+                    // Plain text, JSON, XML, code, CSV, Markdown
+                    if (ct.startsWith('text/') || ct.includes('json') || ct.includes('xml') || ['json', 'xml', 'md', 'csv', 'txt', 'css', 'js'].includes(ext)) {
+                        await renderText();
+                        return;
+                    }
+
+                    // Default: HTML and unknown types → iframe
+                    const blobUrl = URL.createObjectURL(blob);
+                    previewModalBody._blobUrl = blobUrl;
+                    const iframe = document.createElement('iframe');
+                    iframe.src = blobUrl;
+                    iframe.setAttribute('title', name || 'File preview');
+                    previewModalBody.appendChild(iframe);
                 })
                 .catch(err => {
                     previewModalBody.innerHTML = `<span class="preview-error">${err.message || 'Failed to load preview.'}</span>`;
+                    // Offer direct download when preview fails
+                    const dl = document.createElement('a');
+                    dl.href = fileUrl;
+                    dl.download = name || 'download';
+                    dl.className = 'btn btn_primary';
+                    dl.style.marginTop = '12px';
+                    dl.textContent = 'Download file';
+                    previewModalBody.appendChild(dl);
                 });
         }
 
