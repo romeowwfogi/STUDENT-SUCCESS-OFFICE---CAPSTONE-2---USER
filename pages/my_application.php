@@ -1461,7 +1461,8 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
         function generateTableRow(application, index) {
             const editDisabled = !application.can_update;
             const editTitle = editDisabled ? 'Updates disabled' : 'Edit';
-            const editDisabledAttr = editDisabled ? 'disabled aria-disabled="true"' : '';
+            // Keep button clickable for modal messaging; do not use native disabled
+            const editDisabledAttr = editDisabled ? 'aria-disabled="true" data-disabled="true"' : '';
             const editStyle = editDisabled ? 'style="opacity:0.6; cursor:not-allowed;"' : '';
             const badgeBg = `${application.statusColor}20`;
             return `
@@ -1896,8 +1897,26 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
             tableBody.addEventListener('click', (evt) => {
                 const editBtn = evt.target.closest('.action_edit');
                 if (editBtn) {
-                    const isDisabled = editBtn.hasAttribute('disabled') || editBtn.getAttribute('aria-disabled') === 'true';
-                    if (isDisabled) return;
+                    const isDisabled = editBtn.getAttribute('aria-disabled') === 'true' || editBtn.getAttribute('data-disabled') === 'true';
+                    if (isDisabled) {
+                        // Show modal message when edits are locked
+                        if (typeof messageModalV1Show === 'function') {
+                            messageModalV1Show({
+                                icon: `<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' width='28' height='28'><path stroke-linecap='round' stroke-linejoin='round' d='M11.25 9V5.25m0 0L9 7.5m2.25-2.25l2.25 2.25M12 9v6m0 0H6m6 0h6' /></svg>`,
+                                iconBg: '#f3f4f6',
+                                actionBtnBg: '#2563eb',
+                                showCancelBtn: false,
+                                title: 'Editing Locked',
+                                message: 'You cannot edit this submission at this time.',
+                                cancelText: 'Cancel',
+                                actionText: 'OK',
+                                onConfirm: () => {}
+                            });
+                        } else {
+                            alert('Editing is locked for this submission.');
+                        }
+                        return;
+                    }
                     const sid = editBtn.getAttribute('data-submission-id');
                     if (sid) {
                         openEditModal(parseInt(sid, 10));

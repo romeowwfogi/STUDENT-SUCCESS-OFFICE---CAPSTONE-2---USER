@@ -86,6 +86,13 @@ try {
         }
     }
 
+    // After successful field updates, lock further edits for this user
+    $sqlLock = "UPDATE admission_submission SET can_update = 0, updated_at = NOW() WHERE user_id = ?";
+    $resLock = executeUpdate($conn, $sqlLock, 'i', [$ACCOUNT_ID]);
+    if (!$resLock['success']) {
+        throw new Exception($resLock['message'] ?? 'Failed to update admission_submission lock');
+    }
+
     $conn->commit();
     echo json_encode(["success" => true, "message" => "Data updated", "updated" => $updatedCount]);
 } catch (Exception $e) {

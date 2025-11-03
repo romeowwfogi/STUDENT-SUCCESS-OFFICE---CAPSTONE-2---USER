@@ -195,6 +195,7 @@ if ($newUrl) {
 $updates = [
     'requirements_uploads_updated' => 0,
     'submission_files_updated' => 0,
+    'admission_submission_locked' => 0,
 ];
 
 if (isset($conn) && !$conn->connect_error) {
@@ -253,6 +254,15 @@ if (isset($conn) && !$conn->connect_error) {
         }
 
         $updates['submission_files_updated'] = $subAffected;
+    }
+
+    // If external update succeeded, lock further edits for this user
+    if ($statusCode && $statusCode >= 200 && $statusCode < 300) {
+        $sqlLock = "UPDATE admission_submission SET can_update = 0, updated_at = NOW() WHERE user_id = ?";
+        $resLock = executeUpdate($conn, $sqlLock, 'i', [$ACCOUNT_ID]);
+        if ($resLock['success']) {
+            $updates['admission_submission_locked'] = intval($resLock['affected_rows'] ?? 0);
+        }
     }
 }
 
