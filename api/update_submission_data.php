@@ -86,11 +86,11 @@ try {
         }
     }
 
-    // After successful field updates, lock further edits for this user
-    $sqlLock = "UPDATE admission_submission SET can_update = 0, updated_at = NOW() WHERE user_id = ?";
-    $resLock = executeUpdate($conn, $sqlLock, 'i', [$ACCOUNT_ID]);
+    // After successful field updates, lock further edits for this submission
+    $sqlLock = "UPDATE submissions SET can_update = 0 WHERE id = ? AND user_id = ?";
+    $resLock = executeUpdate($conn, $sqlLock, 'ii', [$submissionId, $ACCOUNT_ID]);
     if (!$resLock['success']) {
-        throw new Exception($resLock['message'] ?? 'Failed to update admission_submission lock');
+        throw new Exception($resLock['message'] ?? 'Failed to update submission lock');
     }
 
     $conn->commit();

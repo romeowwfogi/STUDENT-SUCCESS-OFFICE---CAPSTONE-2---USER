@@ -22,6 +22,7 @@ $routes = [
     'admission/application' => 'pages/admission_application.php',
     'admission/submit-application' => 'pages/submit_application.php',
     'admission/received-application' => 'pages/received_application.php',
+    'admission/settings' => 'pages/settings.php',
     'api/register' => 'api/register.php',
     'api/login' => 'api/login.php',
     'api/login-send-otp' => 'api/send_otp.php',

@@ -1,0 +1,205 @@
+UI/UX QA Report — All Major Frontend Files
+Date: 2025-11-09
+
+Scope Covered
+- Pages: `pages/index.php`, `pages/contact-us.php`, auth pages (`signin.php`, `signup.php`, `forgot_pass.php`, `signin_otp.php`, `signin_verify_otp.php`, `activate_account.php`, `verify_account.php`), admission pages (`admission_home.php`, `my_application.php`, `admission_application.php`), `about.php`, `downloadable-forms.php`.
+- CSS: `landingpage.css`, `contact-us.css`, `signin.css`, `signup.css`, `forgot_pass.css`, `signin_otp.css`, `signin_verify_otp.css`, `forms.css`, `admission_dashboard.css`, `admission_application.css`, `about.css`, `global_styling.css`, `global_styling2.css`.
+- JS (UI only): `pages/src/js/announcements.js`, `pages/src/js/admission_application.js` (form UI behaviors).
+
+Sitewide (global_styling.css, global_styling2.css)
+Layout & Responsiveness
+- ✅ Uses spacing tokens and CSS variables; helps maintain rhythm sitewide
+- ✅ Max-width containers present; grid/flex patterns used consistently
+- ⚠ Some fixed heights remain; can cause issues on smaller devices
+- 💡 Replace hard `min-height` with content-driven sizing at mobile breakpoints
+
+Visual Design
+- ✅ Brand palette consistent (greens/yellows/white)
+- ⚠ Contrast occasionally borderline over gradients or images
+- 💡 Verify WCAG AA across sections; consider dark overlays or higher text opacity
+
+Accessibility
+- ✅ Base font sizes legible; headings clear
+- ⚠ Focus-visible styles not universally enforced
+- 💡 Provide standardized `:focus-visible` styles in global CSS for buttons/links/inputs
+
+Interactions & Feedback
+- ✅ Transitions mostly minimal, not distracting
+- ⚠ Button states not standardized (hover/active/disabled/loading)
+- 💡 Create a global button component and apply across pages
+
+Consistency & Usability
+- ✅ Tokens/variables used widely
+- ⚠ Mixed component styles across pages (forms and cards)
+- 💡 Centralize common components (cards/forms/headers) in global CSS partials
+
+Homepage (index.php + landingpage.css + announcements.js)
+Layout & Responsiveness
+- ✅ Announcements carousel uses responsive card widths (`clamp`) and scales well
+- ✅ Sections stack correctly with generous spacing
+- ⚠ Carousel gap on small screens can feel wide; continuous motion may be strong for some users
+- 💡 Reduce gap on mobile and offer an accessible pause/resume control
+
+Visual Design
+- ✅ Strong hierarchy: section headings, card titles, meta labels
+- ⚠ Edge gradients/fade masks missing; hard cut at carousel edges
+- 💡 Add fade masks to improve visual polish and reduce abrupt edges
+
+Accessibility
+- ✅ `aria-live="polite"` in carousel; keyboard left/right supported
+- ⚠ No visible nav buttons; rAF autoplay without keyboard pause control
+- 💡 Add pause/resume toggle with `aria-pressed` and consider nav buttons on desktop
+
+Interactions & Feedback
+- ✅ Smooth scrolling and swipe; scrollbar hidden
+- ⚠ No focus feedback on cards/links inside carousel
+- 💡 Add `:focus-visible` styles for links within cards
+
+Consistency & Usability
+- ✅ Card design consistent; icons and titles align
+- ⚠ JS references `.carousel_btn.prev/next` but markup may not include them
+- 💡 Align UI and JS: add buttons or remove code referencing them
+
+Contact Us (contact-us.php + contact-us.css)
+Layout & Responsiveness
+- ✅ Two-column layout on desktop; single-column stack on mobile
+- ✅ Background image overlay for contact info improves readability
+- ⚠ Spacing and alignment can be uneven on small screens
+- 💡 Standardize gaps and padding; ensure full-width elements are consistent
+
+Visual Design
+- ✅ Icon blocks with yellow accents are consistent and clear
+- ⚠ White text over lighter gradient risks contrast issues
+- 💡 Darken gradient or increase overlay for better legibility
+
+Accessibility
+- ✅ Labels present
+- ⚠ Missing input `id` values tied to labels; placeholders low contrast
+- 💡 Add matching `id` to inputs and stronger `:focus-visible` outlines
+
+Interactions & Feedback
+- ✅ Clear primary button
+- ⚠ Lack of inline validation and success/error feedback
+- 💡 Provide helper/error text and visual states; add `type="submit"`
+
+Consistency & Usability
+- ✅ Component styles mostly consistent
+- ⚠ Form rhythm (spacing between label/input) could be tighter
+- 💡 Harmonize vertical rhythm with global scale (e.g., 8/12/16/24/32)
+
+Auth Pages (signin.css, signup.css, forgot_pass.css, signin_otp.css, signin_verify_otp.css)
+Layout & Responsiveness
+- ✅ Centered forms with predictable stacking
+- ⚠ Inputs and buttons vary in spacing across files
+- 💡 Use shared form layout with standardized gaps and widths
+
+Visual Design
+- ✅ Accent color consistent for CTAs
+- ⚠ Typography scale varies between pages (e.g., h1/h2 sizes)
+- 💡 Standardize heading hierarchy and form label sizes across auth pages
+
+Accessibility
+- ✅ Labels generally present
+- ⚠ Focus styles minimal; error messages might rely on color alone
+- 💡 Add `:focus-visible` styles and include ARIA live regions for validation messages
+
+Interactions & Feedback
+- ✅ Buttons clear
+- ⚠ Missing loading/disabled states; password fields need show/hide affordances consistently
+- 💡 Provide microinteractions for forms (loading spinner, disabled state, eye toggle)
+
+Consistency & Usability
+- ✅ Overall design language consistent
+- ⚠ Component inconsistencies in spacing and field emphasis
+- 💡 Apply a unified form component with shared CSS classes
+
+Admission Dashboard & My Application (admission_dashboard.css)
+Layout & Responsiveness
+- ✅ Grid structure and cards present
+- ⚠ Ensure tables/cards wrap and don’t overflow on narrow screens
+- 💡 Add responsive table patterns (stacked rows or scroll containers)
+
+Visual Design
+- ✅ Dashboard colors aligned with brand
+- ⚠ Dense information areas can benefit from clearer typographic hierarchy
+- 💡 Use consistent heading and subheading styles for sections/panels
+
+Accessibility
+- ✅ Icons used as cues alongside text
+- ⚠ Keyboard navigation not explicitly styled
+- 💡 Define focus styles for interactive rows/cards
+
+Interactions & Feedback
+- ✅ Clear navigational anchors
+- ⚠ Feedback on actions (filters, pagination) may be implicit
+- 💡 Provide small transitions and loading indicators
+
+Admission Application (admission_application.php + admission_application.css + admission_application.js)
+Layout & Responsiveness
+- ✅ Multi-step form visuals understandable
+- ⚠ Certain field groups may crowd on mobile
+- 💡 Increase spacing and stack multi-column groups for small screens
+
+Visual Design
+- ✅ Clear section headers
+- ⚠ Form fields emphasis may be low in dense sections
+- 💡 Use stronger borders or background tints for grouped fields
+
+Accessibility
+- ✅ Labels present; sample validations in JS
+- ⚠ Error feedback might rely only on color; focus management needed
+- 💡 Add ARIA for error messages and auto-focus invalid fields
+
+Interactions & Feedback
+- ✅ Inline validation present for contact number pattern
+- ⚠ Missing success/failed submission UI patterns
+- 💡 Provide summary confirmation screen with accessible feedback
+
+Consistency & Usability
+- ✅ Multi-step metaphor consistent
+- ⚠ Differing component spacing from other pages
+- 💡 Reuse global form and card styles to maintain consistency
+
+About & Downloadable Forms (about.css, forms.css)
+Layout & Responsiveness
+- ✅ Standard grid/flex layouts
+- ⚠ Ensure large images scale and don’t overflow
+- 💡 Apply `max-width: 100%` and `object-fit` for media
+
+Visual Design
+- ✅ Palette and typography consistent
+- ⚠ Inconsistent spacing in long lists or documents
+- 💡 Standardize list spacing and heading margins
+
+Accessibility
+- ✅ Text readable
+- ⚠ Long content sections may not have landmark roles
+- 💡 Add landmark roles (`<main>`, `<section aria-label>`) for assistive tech
+
+Interactions & Feedback
+- ✅ Links clear
+- ⚠ Download actions may lack feedback
+- 💡 Add small loading states or confirmation modals if needed
+
+Consistency & Usability
+- ✅ General consistency retained
+- ⚠ Minor spacing inconsistencies
+- 💡 Apply global rhythm scale across lists/doc sections
+
+Top Priority Recommendations (Cross-File)
+1) Accessibility & Forms
+   - Add `id` attributes tied to labels; enforce `:focus-visible` across components.
+   - Provide ARIA live regions for validation messages and a11y-friendly error handling.
+2) Buttons & Microinteractions
+   - Standardize button states (hover/active/disabled/loading) in global CSS; adopt across all pages.
+3) Carousel Control
+   - Add accessible pause/resume control; consider nav buttons on desktop.
+4) Layout Rhythm
+   - Remove fixed `min-height` at mobile; rely on padding/gap tokens and fluid max-width containers.
+5) Contrast & Readability
+   - Ensure WCAG AA contrast where text overlays gradients/images; adjust overlay/tint or text opacity.
+
+Questions for Design Intent
+- Should nav buttons for carousel be visible on all breakpoints?
+- Are auth pages meant to share a single form style library?
+- Do admissions dashboard tables need a mobile-friendly redesign (cards/stacked rows)?

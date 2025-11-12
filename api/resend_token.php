@@ -194,19 +194,15 @@ try {
         // 🕒 Greeting message
         $greetings = getGreetingMessage();
 
-        // 🌐 Build token verification link
+        // 🌐 Build absolute verification link independent of current route
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443)
             ? "https://" : "http://";
         $host = $_SERVER['HTTP_HOST'];
         $requestUri = $_SERVER['REQUEST_URI'];
-        $currentUrl = $protocol . $host . $requestUri;
-
-        // Replace "api/register" in current URL with verify link
-        $tokenLink = str_replace(
-            "api/resend-login-verification",
-            "verify-account?token=" . $token,
-            $currentUrl
-        );
+        $pathOnly = parse_url($requestUri, PHP_URL_PATH);
+        // Remove any trailing /api/... segment to get app base path
+        $basePath = preg_replace('#/api/.*$#', '', $pathOnly);
+        $tokenLink = $protocol . $host . rtrim($basePath, '/') . '/verify-account?token=' . urlencode($token);
 
         // 🕓 Format expiration date (based on DB field or 24hr default)
         if ($expiresAt) {

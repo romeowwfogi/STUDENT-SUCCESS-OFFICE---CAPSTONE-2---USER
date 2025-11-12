@@ -124,7 +124,6 @@
     .footer_image {
         grid-area: footer_image;
         display: flex;
-        background: var(--color-darkergreen-base);
         justify-content: flex-end;
     }
 

@@ -3,45 +3,45 @@
     .profile-modal {
         display: none;
         position: fixed;
-        z-index: 500;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(4px);
+        inset: 0;
+        z-index: 1200;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
     }
 
     .profile-modal.active {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
     }
 
     .profile-modal-content {
         background: #ffffff;
-        border-radius: 16px;
-        padding: 32px;
+        border-radius: 14px;
+        padding: 24px 20px;
         width: 100%;
-        max-width: 480px;
+        max-width: 520px;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         position: relative;
-        border: 1px solid rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
     }
 
     .profile-modal-header {
-        margin-bottom: 32px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f1f3f4;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .profile-modal-title {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 600;
-        color: #1f2937;
+        color: #111827;
         margin: 0;
         line-height: 1.4;
     }
@@ -159,16 +159,16 @@
         display: flex;
         gap: 12px;
         justify-content: flex-end;
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 1px solid #f1f3f4;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
     }
 
     .btn-cancel {
-        background: #ffffff;
-        color: #374151;
-        border: 1px solid #d1d5db;
-        padding: 10px 20px;
+        background: var(--cancel, #e5e7eb);
+        color: var(--text, #111827);
+        border: none;
+        padding: 10px 16px;
         border-radius: 8px;
         font-size: 14px;
         font-weight: 500;
@@ -182,10 +182,10 @@
     }
 
     .btn-save {
-        background: #3b82f6;
+        background: var(--accent, #2E7D32);
         color: white;
         border: none;
-        padding: 10px 20px;
+        padding: 10px 16px;
         border-radius: 8px;
         font-size: 14px;
         font-weight: 500;
@@ -194,31 +194,31 @@
     }
 
     .btn-save:hover {
-        background: #2563eb;
+        filter: brightness(0.95);
         transform: translateY(-1px);
     }
 
     .close-btn {
         position: absolute;
-        top: 16px;
-        right: 16px;
-        background: none;
+        top: 10px;
+        right: 10px;
+        background: #f3f4f6;
         border: none;
-        font-size: 20px;
+        font-size: 18px;
         cursor: pointer;
-        color: #9ca3af;
-        transition: color 0.2s ease;
+        color: #6b7280;
+        transition: all 0.2s ease;
         width: 32px;
         height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 6px;
+        border-radius: 8px;
     }
 
     .close-btn:hover {
         color: #374151;
-        background: #f3f4f6;
+        background: #e5e7eb;
     }
 
     /* Responsive Design */
@@ -249,6 +249,7 @@
     <div class="profile-modal-content">
         <div class="profile-modal-header">
             <h2 class="profile-modal-title">Complete Your Profile</h2>
+            <button type="button" class="close-btn" aria-label="Close" onclick="closeProfileModal()">✕</button>
         </div>
 
         <form id="profileForm" method="POST">
@@ -273,6 +274,7 @@
             </div>
 
             <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeProfileModal()">Cancel</button>
                 <button type="submit" class="btn-save">Save Profile</button>
             </div>
         </form>
@@ -384,14 +386,19 @@
                 };
 
                 // Send data to API
-                fetch('../api/set-profile', {
+                fetch('../api/set_profile.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify(profileData)
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Request failed: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             // Show success message

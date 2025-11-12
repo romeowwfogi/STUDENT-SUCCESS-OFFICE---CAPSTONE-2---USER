@@ -66,7 +66,13 @@ try {
             COALESCE(st.hex_color, '#64748b') AS status_color,
             s.remarks,
             COALESCE(at.name, 'N/A') AS type,
-            COALESCE(c.cycle_name, 'N/A') AS academic_year,
+            CASE 
+                WHEN c.academic_year_start IS NOT NULL AND c.academic_year_end IS NOT NULL
+                    THEN CONCAT(c.academic_year_start, '-', c.academic_year_end)
+                WHEN c.academic_year_start IS NOT NULL
+                    THEN CAST(c.academic_year_start AS CHAR)
+                ELSE 'N/A'
+            END AS academic_year,
             DATE_FORMAT(s.submitted_at, '%Y-%m-%d %H:%i:%s') AS submitted_at
         FROM submissions s
         LEFT JOIN applicant_types at ON at.id = s.applicant_type_id

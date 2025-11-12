@@ -6,6 +6,9 @@ if (isset($_GET['token']) && !empty($_GET['token'])) {
     include "functions/select_sql.php";
     include "functions/update_sql.php";
 
+    // Ensure consistent timezone for accurate expiration comparisons
+    date_default_timezone_set('Asia/Manila');
+
 
     // Get token from query param (fallback to empty string)
     $token = $_GET['token'] ?? '';

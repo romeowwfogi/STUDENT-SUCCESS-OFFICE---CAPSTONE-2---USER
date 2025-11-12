@@ -12,6 +12,7 @@ include "functions/en-de_crypt.php";
 include "functions/send_email.php";
 include "functions/greetings.php";
 include "functions/config_msg.php";
+include "functions/expiration_config.php";
 
 // === DEBUG SETTINGS ===
 date_default_timezone_set('Asia/Manila'); // Set your timezone
@@ -129,6 +130,16 @@ if ($accStatus === "active") {
 
 $conn->begin_transaction();
 try {
+    // Read activation/verification expiration config
+    $type = 'activation_account';
+    $response = executeExpirationConfig($conn, $type);
+
+    if ($response['success']) {
+        $intervalValue = $response['data']['interval_value'];
+        $intervalUnit  = $response['data']['interval_unit'];
+    } else {
+        throw new Exception("Failed to get expiration config for '$type'");
+    }
     do {
         // Generate a random 64-character token
         $token = bin2hex(random_bytes(32));
@@ -143,7 +154,7 @@ try {
         $tokenExists = ($result['success'] && count($result['data']) > 0);
     } while ($tokenExists);
 
-    $sql1 = "UPDATE tokenization SET value = ?, expires_at = DATE_ADD(NOW(), INTERVAL 1 DAY), is_used = 0
+    $sql1 = "UPDATE tokenization SET value = ?, expires_at = DATE_ADD(NOW(), INTERVAL $intervalValue $intervalUnit), is_used = 0
             WHERE user_id = ? 
                 AND name = 'VERIFY_ACCOUNT'
             ";
@@ -155,7 +166,7 @@ try {
         throw new Exception($result1['message']);
     }
 
-    $sql4 = "SELECT expires_at FROM tokenization WHERE user_id = ? ORDER BY id DESC LIMIT 1";
+    $sql4 = "SELECT expires_at FROM tokenization WHERE user_id = ? AND name = 'VERIFY_ACCOUNT' ORDER BY id DESC LIMIT 1";
     $types4 = "i";
     $params4 = [$ACCOUNT_ID];
     $result4 = executeSelect($conn, $sql4, $types4, $params4);
@@ -177,19 +188,15 @@ try {
         // 🕒 Greeting message
         $greetings = getGreetingMessage();
 
-        // 🌐 Build token verification link
+        // 🌐 Build absolute verification link independent of current route
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443)
             ? "https://" : "http://";
         $host = $_SERVER['HTTP_HOST'];
         $requestUri = $_SERVER['REQUEST_URI'];
-        $currentUrl = $protocol . $host . $requestUri;
-
-        // Replace "api/register" in current URL with verify link
-        $tokenLink = str_replace(
-            "api/register",
-            "verify-account?token=" . $token,
-            $currentUrl
-        );
+        $pathOnly = parse_url($requestUri, PHP_URL_PATH);
+        // Remove any trailing /api/... segment to get app base path
+        $basePath = preg_replace('#/api/.*$#', '', $pathOnly);
+        $tokenLink = $protocol . $host . rtrim($basePath, '/') . '/verify-account?token=' . urlencode($token);
 
         // 🕓 Format expiration date (based on DB field or 24hr default)
         if ($expiresAt) {

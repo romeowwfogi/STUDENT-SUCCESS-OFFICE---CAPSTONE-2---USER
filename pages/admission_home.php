@@ -65,18 +65,18 @@ if ($resUserEmail['success'] && count($resUserEmail['data']) > 0) {
     $EMAIL_ADDRESS = decryptData($resUserEmail['data'][0]['email']);
 }
 
-// --- UPDATED QUERY ---
+// --- Align query with database.md schema and cycle window ---
 $sql = "SELECT
-            at.id, at.name,
-            c.cycle_name
-        FROM
-            applicant_types at
-        JOIN
-            admission_cycles c ON at.admission_cycle_id = c.id
-        WHERE
-            at.is_active = 1 AND at.is_archived = 0
-        ORDER BY
-            c.cycle_name, at.name";
+            at.id,
+            at.name,
+            c.academic_year_start,
+            c.academic_year_end
+        FROM applicant_types at
+        INNER JOIN admission_cycles c ON at.admission_cycle_id = c.id
+        WHERE at.is_active = 1
+          AND c.is_archived = 0
+          AND NOW() BETWEEN c.admission_date_time_start AND c.admission_date_time_end
+        ORDER BY c.academic_year_start DESC, at.name ASC";
 
 $result = $conn->query($sql);
 $active_types = [];
@@ -84,6 +84,26 @@ if ($result) {
     while ($row = $result->fetch_assoc()) {
         $active_types[] = $row;
     }
+}
+
+// Determine academic year label for banner if available
+$academicYearLabel = null;
+if (!empty($active_types)) {
+    $firstCycle = $active_types[0];
+    if (!empty($firstCycle['academic_year_start']) && !empty($firstCycle['academic_year_end'])) {
+        $academicYearLabel = $firstCycle['academic_year_start'] . '-' . $firstCycle['academic_year_end'];
+    }
+}
+
+// Gate: check if user can apply; disable navigation if not
+$isRestrictedApply = false;
+try {
+    $gateResult = executeSelect($conn, "SELECT can_apply FROM admission_controller WHERE user_id = ? LIMIT 1", "i", [$user_id]);
+    if ($gateResult['success'] && count($gateResult['data']) > 0) {
+        $isRestrictedApply = ((int)($gateResult['data'][0]['can_apply'] ?? 1) === 0);
+    }
+} catch (Throwable $e) {
+    $isRestrictedApply = false;
 }
 
 ?>
@@ -109,7 +129,11 @@ if ($result) {
                 <div class="banner_tile">
                     <div class="text_area_container">
                         <h2 class="bigger_text">CHOOSE YOUR APPLICATION TYPE</h2>
-                        <p>ACADEMIC YEAR 2025-2026</p>
+                        <?php if ($academicYearLabel): ?>
+                            <p>ACADEMIC YEAR <?php echo htmlspecialchars($academicYearLabel); ?></p>
+                        <?php else: ?>
+                            <p>ADMISSION STATUS: CLOSED</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -117,11 +141,16 @@ if ($result) {
             <!-- Cards Menu -->
             <div class="cards_menu_container">
 
-                <?php if (empty($active_types)): ?>
+                <?php if ($isRestrictedApply): ?>
                     <div class="gradelvl_container_menu" style="display:flex;align-items:center;justify-content:center;min-height:220px;width:100%;grid-column:1 / -1;">
                         <div class="gradelvl_container_info" style="text-align:center;">
-                            <p class="year_and_program_container" style="margin-bottom:8px;">Admission not available</p>
-                            <p style="opacity:0.8;">No open admission cycles at the moment. Please check back later.</p>
+                            <p style="opacity:0.8;">You have already submitted an application. New applications are disabled.</p>
+                        </div>
+                    </div>
+                <?php elseif (empty($active_types)): ?>
+                    <div class="gradelvl_container_menu" style="display:flex;align-items:center;justify-content:center;min-height:220px;width:100%;grid-column:1 / -1;">
+                        <div class="gradelvl_container_info" style="text-align:center;">
+                            <p style="opacity:0.8;">No open admission at the moment. Please check back later.</p>
                         </div>
                     </div>
                 <?php else: ?>
@@ -223,6 +252,7 @@ if ($result) {
         let middle_name = "<?php echo $middle_name; ?>";
         let last_name = "<?php echo $last_name; ?>";
         let suffix = "<?php echo $suffix; ?>";
+        let user_email = "<?php echo $EMAIL_ADDRESS; ?>";
     </script>
     <script src="../pages/src/js/profile_info.js"></script>
 </body>

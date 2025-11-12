@@ -3,146 +3,62 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Basic auth check via session token
-$sessionToken = $_SESSION['token'] ?? null;
+// Basic auth guard (require logged-in user)
 $ACCOUNT_ID = isset($_SESSION['user_id']) ? base64_decode($_SESSION['user_id']) : null;
-if (!$sessionToken || !$ACCOUNT_ID) {
-    header('Content-Type: application/json');
+if (!$ACCOUNT_ID) {
     http_response_code(401);
-    echo json_encode(["success" => false, "message" => "Unauthorized access."]);
+    header('Content-Type: application/json');
+    echo json_encode(["success" => false, "message" => "Unauthorized"]);
     exit;
 }
 
-// Extract raw token from 'Bearer <base64>' format
-if (strpos($sessionToken, 'Bearer ') === 0) {
-    $encodedToken = substr($sessionToken, 7);
-    $rawToken = base64_decode($encodedToken);
-} else {
-    header('Content-Type: application/json');
-    http_response_code(401);
-    echo json_encode(["success" => false, "message" => "Invalid session token format."]);
-    exit;
-}
-
-// Validate token against DB (optional but safer)
-include __DIR__ . '/../connection/main_connection.php';
-include __DIR__ . '/../functions/select_sql.php';
-if ($conn && !$conn->connect_error) {
-    $sql = "SELECT id FROM tokenization WHERE user_id = ? AND name = 'SESSION' AND value = ? AND is_used = 0";
-    $types = "is";
-    $params = [$ACCOUNT_ID, $rawToken];
-    $result = executeSelect($conn, $sql, $types, $params);
-    if (!$result['success'] || count($result['data']) === 0) {
-        header('Content-Type: application/json');
-        http_response_code(401);
-        echo json_encode(["success" => false, "message" => "Session expired or invalid."]);
-        exit;
-    }
-}
-
-// Ensure credentials exist in session
-$email = $_SESSION['email_address'] ?? '';
-$password = $_SESSION['password'] ?? '';
-if (!$email || !$password) {
-    header('Content-Type: application/json');
-    http_response_code(401);
-    echo json_encode(["success" => false, "message" => "Missing credentials in session."]);
-    exit;
-}
-
-// Read URL (the file to preview from external API storage)
-$url = $_GET['url'] ?? '';
-$url = trim($url);
-// Frontend may send the URL fully percent-encoded via encodeURIComponent
-// Decode here so parse_url can understand it
-$url = rawurldecode($url);
-if (!$url) {
-    header('Content-Type: application/json');
+$url = isset($_GET['url']) ? trim($_GET['url']) : '';
+if ($url === '') {
     http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Missing required parameter: url"]);
+    header('Content-Type: application/json');
+    echo json_encode(["success" => false, "message" => "Missing url"]);
     exit;
 }
 
-// Normalize and validate path (handle encoded spaces and alternate base)
 $parsed = parse_url($url);
-if (!$parsed || !isset($parsed['path'])) {
-    header('Content-Type: application/json');
-    http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Invalid URL format."]);
-    exit;
-}
+$projectRoot = dirname(__DIR__);
+$privateDir = $projectRoot . DIRECTORY_SEPARATOR . 'pages' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR;
 
-$path = $parsed['path'] ?? '';
-$decodedPath = rawurldecode($path);
-
-// If path points under uploads/requirements, standardize to configured base URL
-$uploadsPos = strpos($decodedPath, '/uploads/requirements/');
-if ($uploadsPos !== false) {
-    $tail = substr($decodedPath, $uploadsPos);
-    if (isset($UPLOAD_REQUIREMENTS_BASE_URL) && $UPLOAD_REQUIREMENTS_BASE_URL) {
-        $hostBase = rtrim($UPLOAD_REQUIREMENTS_BASE_URL, '/') . '/';
-        $safeBase = str_replace(' ', '%20', $hostBase);
-        $url = $safeBase . ltrim($tail, '/');
+$isLocalPrivate = false;
+$targetFsPath = null;
+if ($parsed && isset($parsed['path'])) {
+    $path = str_replace(['\\'], '/', $parsed['path']);
+    $pos = stripos($path, '/pages/src/media/private/');
+    if ($pos !== false) {
+        $filename = substr($path, $pos + strlen('/pages/src/media/private/'));
+        if ($filename !== '' && preg_match('/^[A-Za-z0-9._-]+$/', $filename)) {
+            $targetFsPath = $privateDir . $filename;
+            $isLocalPrivate = file_exists($targetFsPath);
+        }
     }
 }
 
-// Build request to external preview API from configuration
-if (!isset($PREVIEW_REQUIREMENTS_URL) || !$PREVIEW_REQUIREMENTS_URL) {
-    header('Content-Type: application/json');
-    http_response_code(500);
-    echo json_encode(["success" => false, "message" => "Preview API URL is not configured."]);
+if ($isLocalPrivate && $targetFsPath) {
+    // Detect content type by extension
+    $ext = strtolower(pathinfo($targetFsPath, PATHINFO_EXTENSION));
+    $ct = 'application/octet-stream';
+    if (in_array($ext, ['png','jpg','jpeg','gif','webp'])) $ct = 'image/' . ($ext === 'jpg' ? 'jpeg' : $ext);
+    elseif ($ext === 'pdf') $ct = 'application/pdf';
+    elseif (in_array($ext, ['txt','log'])) $ct = 'text/plain; charset=utf-8';
+    elseif (in_array($ext, ['csv'])) $ct = 'text/csv; charset=utf-8';
+    elseif (in_array($ext, ['json'])) $ct = 'application/json; charset=utf-8';
+    elseif (in_array($ext, ['doc','docx'])) $ct = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    elseif (in_array($ext, ['xls','xlsx'])) $ct = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+    header('Content-Type: ' . $ct);
+    header('X-Proxy-Source: local');
+    readfile($targetFsPath);
     exit;
 }
 
-$externalEndpoint = $PREVIEW_REQUIREMENTS_URL;
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $externalEndpoint);
-curl_setopt($ch, CURLOPT_POST, true);
-// Let cURL set proper multipart/form-data with boundary automatically
-$postFields = [
-    'email' => $email,
-    'password' => $password,
-    'url' => $url,
-];
-curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HEADER, true); // include headers in output for content-type extraction
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-$response = curl_exec($ch);
-if ($response === false) {
-    $err = curl_error($ch);
-    curl_close($ch);
-    header('Content-Type: application/json');
-    http_response_code(502);
-    echo json_encode(["success" => false, "message" => "Preview request failed: $err"]);
-    exit;
-}
-
-$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-$headers = substr($response, 0, $headerSize);
-$body = substr($response, $headerSize);
-curl_close($ch);
-
-// Pass through status code
-http_response_code($statusCode ?: 200);
-
-// If external responded JSON, forward as JSON
-if ($contentType && stripos($contentType, 'application/json') !== false) {
-    header('Content-Type: application/json');
-    echo $body;
-    exit;
-}
-
-// Otherwise stream bytes with detected content type
-header('Content-Type: ' . ($contentType ?: 'application/octet-stream'));
-// Try to pass content-length if present in upstream headers
-if (preg_match('/^Content-Length:\s*(\d+)/mi', $headers, $m)) {
-    header('Content-Length: ' . $m[1]);
-}
-echo $body;
+// For non-local paths, deny for safety
+http_response_code(403);
+header('Content-Type: application/json');
+echo json_encode(["success" => false, "message" => "Preview not allowed for remote URL"]);
 exit;
+?>

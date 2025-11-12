@@ -1,0 +1,11 @@
+[2025-11-11 04:15:17 Asia/Manila] set_profile invoked
+[2025-11-11 04:15:17 Asia/Manila] Session token present: yes
+[2025-11-11 11:15:19 Asia/Manila] Input parsed FN=Mark Andrie LN=Datus MN=N SFX=N
+[2025-11-11 11:15:20 Asia/Manila] Decoded session token present: yes account_id: 5
+[2025-11-11 11:15:20 Asia/Manila] Validating session in tokenization: result_success=yes rows=1[2025-11-11 04:16:49 Asia/Manila] set_profile invoked
+[2025-11-11 04:16:49 Asia/Manila] Session token present: yes
+[2025-11-11 11:16:50 Asia/Manila] Input parsed FN=Mark Andrie LN=Datus MN=N SFX=N
+[2025-11-11 11:16:51 Asia/Manila] Decoded session token present: yes account_id: 5
+[2025-11-11 11:16:52 Asia/Manila] Validating session in tokenization: result_success=yes rows=1
+[2025-11-11 11:16:52 Asia/Manila] Inserting user_fullname for user_id=5
+[2025-11-11 11:16:53 Asia/Manila] Profile set success; committed for user_id=5

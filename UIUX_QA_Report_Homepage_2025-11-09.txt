@@ -1,0 +1,76 @@
+UI/UX QA Report — Homepage (Announcements & Get In Touch)
+Date: 2025-11-09
+
+Layout & Responsiveness
+- ✅ Announcements cards use responsive widths via clamp; carousel scales across breakpoints
+- ✅ Contact section stacks to two boxes on desktop and single column on mobile
+- ✅ Consistent internal spacing with tokens (var(--space-*)); containers have max-widths
+- ⚠ Some fixed heights still present (min-height in right_area_contact may create extra blank space on small devices)
+- ⚠ Twoboxes width on large screens set to 70%; consider fluid container widths to avoid narrow layouts on ultrawide screens
+- ⚠ Carousel gap may cause large empty space at wrap points on very small screens
+- 💡 Use `min-height: auto` for mobile and tablet breakpoints; retain semantic spacing via padding, not height
+- 💡 Consider `max-width: min(1200px, 95vw)` for twoboxes and container to better fill larger screens
+- 💡 Reduce carousel gap on mobile (e.g., 12px) and consider `padding-inline` to keep edges balanced
+
+Visual Design
+- ✅ Color scheme (deep green, yellow accent, white text) aligns with brand and remains readable
+- ✅ Cards have consistent radius and shadows; icons sit in rounded squares for a cohesive look
+- ✅ Typography scale uses headings with stronger weight; fluid sizes are present for Announcements
+- ⚠ White text over lighter gradient segment (#a4a4a4) risks lower contrast in Get In Touch right box
+- ⚠ Label-to-input visual pairing is weak due to thin bottom border only; field states may feel low emphasis
+- ⚠ Inconsistent icon sizes previously; now standardized to 40x40 but verify SVG stroke visibility at small sizes
+- 💡 Ensure contrast ratio ≥ 4.5:1 for body text; consider darkening gradient or increasing text opacity
+- 💡 Strengthen form field visibility: thicker bottom border, subtle background tint on focus, and clearer placeholder contrast
+- 💡 Standardize heading sizes across sections with a scale (e.g., h2 1.75–2rem, h3 1.25–1.5rem)
+
+Accessibility
+- ✅ Announcements carousel has `aria-live="polite"` and keyboard navigation for left/right
+- ✅ Links and buttons use descriptive text (“Learn More”, “View Service”)
+- ⚠ Form labels use `for="Email"/"Subject"/"Message"` but inputs lack matching `id` attributes; ARIA labeling is partial
+- ⚠ Button lacks `type="submit"`; and focus-visible styles may be insufficient (only browser default)
+- ⚠ Carousel continuous motion can be distracting; no explicit pause control for keyboard users
+- 💡 Add matching `id` to inputs and tie labels: `<label for="email">` + `<input id="email">`
+- 💡 Provide `:focus-visible` styles for buttons and inputs (outline/box-shadow with sufficient contrast)
+- 💡 Offer a pause toggle for carousel accessible via keyboard (e.g., button with `aria-pressed`)
+- 💡 Avoid using only color to convey meaning; ensure icons have text equivalents
+
+Interactions & Feedback
+- ✅ Hover effects exist on interactive elements; carousel hides scrollbar and supports swipe
+- ✅ Buttons are present (“Send Message”) with clear intent
+- ⚠ Form lacks success/error feedback and inline validation hints; no disabled/loading states
+- ⚠ Button microinteractions minimal; needs hover/active/focus states for affordance
+- ⚠ Carousel speed is fixed; users cannot adjust or pause easily
+- 💡 Add inline validation and helper text for inputs; show error states (red border, accessible message)
+- 💡 Implement button states: hover (raise/brighten), active (press), disabled (dim), and loading (spinner)
+- 💡 Provide accessible control to pause/resume carousel and perhaps speed toggle
+
+Consistency & Usability
+- ✅ Card styles (radius, shadow, icon container) are consistent across contact items
+- ✅ Spacing tokens used consistently (`var(--space-*)`)
+- ⚠ JS references `.carousel_btn.prev/next` but markup may not include these buttons; UI control mismatch
+- ⚠ Form alignment and spacing consistent, but labels and inputs need stronger hierarchy and rhythm
+- 💡 Either add visible prev/next buttons in the carousel or remove references to them for UI clarity
+- 💡 Harmonize component spacing (vertical rhythm): standardize margins between headings, labels, inputs, and buttons
+- 💡 Consider a “section header” component reused for Announcements and Get In Touch for consistent typography and spacing
+
+Concrete Recommendations
+1) Inputs & Labels
+   - Add `id` to inputs and match with labels (`for`).
+   - Provide `:focus-visible` outlines and helper/error text.
+2) Buttons
+   - Define hover/active/focus/disabled/loading states.
+   - Set `type="submit"` and ensure clear affordance.
+3) Carousel Accessibility
+   - Add keyboard-accessible pause/resume button.
+   - Reduce gap on mobile and add edge fade masks for visual polish.
+4) Contrast & Readability
+   - Darken gradient behind white text or increase text opacity.
+   - Verify contrast with WCAG AA; adjust colors accordingly.
+5) Layout
+   - Use fluid max-width and remove fixed min-heights on mobile.
+   - Keep consistent vertical rhythm with standardized spacing scale.
+
+Open Questions (for design intent)
+- Should the carousel have visible nav buttons on all breakpoints or only desktop?
+- Do form fields require real-time validation or only on submit?
+- What is the expected visual hierarchy for section headers sitewide?

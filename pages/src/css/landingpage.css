@@ -1,5 +1,5 @@
 
-  * {
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -16,6 +16,7 @@
     overflow-x: hidden;
     margin: 0;
     padding: 0;
+    position: relative;
   }
   .main_container {
     width: 100%;
@@ -23,8 +24,28 @@
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+    position: relative;
   }
 
+.landingpage {
+  position: relative;         /* anchor canvas within this section */
+  width: 100%;
+  min-height: 100vh;          /* fill full viewport height */
+  overflow: hidden;           /* clip canvas to section bounds */
+  z-index: 0;                 /* create stacking context for negative child */ /* fallback behind animation to avoid white */
+}
+
+/* Scope canvas to the landing page section only */
+#canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Keep canvas behind everything */
+  pointer-events: none; /* So it doesn’t block clicks */
+  background: linear-gradient(135deg, #128314, #1DCA20); /* fallback color if canvas fails */
+}
 
   /* ======================= HAMBURGER NAV ======================= */
   .hamburger_area {
@@ -95,13 +116,6 @@
   }
 
 
-  .landingpage{
-
-    background-size: cover;      /* fills the container */
-    background-position: center; /* centers the image */
-    background-repeat: no-repeat;
-  }
-
   /* ======================= NAVBAR ======================= */
   .navbar {
     display: grid;
@@ -113,9 +127,10 @@
     width: 100%;
     min-height: 100vh;
     position: relative;
-    
+    z-index: 2; /* ensure text and buttons appear above the canvas */
+}
 
-  }
+  
 
   .nav {
     grid-area: nav;
@@ -252,6 +267,7 @@
     position: relative;
     min-height: 0;
     flex: 1;
+    z-index: 2; /* ensure text and buttons appear above the canvas */
   }
 
   .hero_subcontainer {
@@ -1234,6 +1250,8 @@
 }
 
 .addressbox span, .landlinebox span, .emailbox span {
+  display: flex;
+  justify-content: center;
   padding: var(--space-sm);
   background: #96a82d;
   border-radius: var(--radius-sm);
@@ -1401,18 +1419,19 @@ textarea::placeholder {
   
   .left_area_contact,
   .right_area_contact {
-    padding: var(--space-sm);
+    padding: var(--space-lg);
+    margin-top: var(--space-lg);
   }
   
   /* Center contact info on mobile */
   .addressbox, .landlinebox, .emailbox {
-    justify-content: center;
-    text-align: center;
+    justify-content: left;
+    text-align: left;
     flex-wrap: wrap;
   }
   
   .subdescription {
-    text-align: center;
+    text-align: left;
   }
   
   .button_area {
@@ -1438,6 +1457,112 @@ textarea::placeholder {
   .right_area_contact {
     min-height: 400px;
   }
+}
+
+/* ================= Announcements Section ================= */
+.announcements_section {
+  padding: 48px 24px;
+  color: #fff;
+}
+
+.announcements_header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.announcements_title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color:#FFED21;
+}
+
+.announcements_subtitle {
+  opacity: 0.85;
+}
+
+.announcements_wrapper {
+  overflow: hidden; /* hide overflowing cards */
+  position: relative;
+}
+
+.announcements_carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  overflow-x: auto; /* enable programmatic/touch horizontal scroll */
+}
+
+.announcement_card {
+  flex: 0 0 clamp(240px, 42vw, 350px);
+  background: rgba(255, 255, 255, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 16px;
+   backdrop-filter: blur(15px) saturate(176%);
+    -webkit-backdrop-filter: blur(10px) saturate(176%);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.125)
+}
+
+
+
+.announcement_meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-yellow-base, #ffd54f);
+}
+
+.announcement_title {
+  font-size: 1.1rem;
+  margin: 8px 0;
+}
+
+.announcement_desc {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2; /* default: show 2 lines */
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+.announcement_actions {
+  margin-top: 12px;
+}
+
+.announcement_actions a{
+  color: yellow;
+}
+
+/* Hide horizontal scrollbar cross-browser */
+.announcements_carousel {
+  -ms-overflow-style: none; /* IE and old Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.announcements_carousel::-webkit-scrollbar {
+  display: none;            /* Chrome, Safari */
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .announcements_title { font-size: clamp(1.75rem, 2.2vw, 2.25rem); }
+  .announcement_title { font-size: clamp(1rem, 1.6vw, 1.25rem); }
+  .announcement_desc { font-size: clamp(0.95rem, 1.4vw, 1.05rem); }
+  .announcement_meta { font-size: clamp(0.85rem, 1.2vw, 0.95rem); }
+}
+
+@media (max-width: 480px) {
+  .announcements_title { font-size: 1.5rem; }
+  .announcement_title { font-size: 0.9rem; }
+  .announcement_desc { font-size: 0.7rem; }
+  .announcement_meta { font-size: 0.8rem; }
 }
 
 

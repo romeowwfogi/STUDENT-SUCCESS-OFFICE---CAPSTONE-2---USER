@@ -291,7 +291,6 @@
             ?>
             <p class="<?php echo str_contains($current_page, 'home') ? 'active' : ''; ?>" onclick="window.location.href = 'home';">HOME</p>
             <p class="<?php echo str_contains($current_page, 'my-application') ? 'active' : ''; ?>" onclick="window.location.href = 'my-application';">MY APPLICATION</p>
-            <p>INBOX</p>
         </div>
 
         <!-- <div class="circlecontainer">
@@ -316,10 +315,8 @@
 <!-- Dropdown Menu -->
 <div class="dropdown_menu">
     <ul>
-        <li><a href="#settings">Settings</a></li>
-        <li><a href="#delete-account">Delete Account</a></li>
-        <li><a href="#help">Help & Support</a></li>
-        <li><a href="#logout">Logout</a></li>
+        <li><a href="#" id="open-settings-modal">Settings</a></li>
+        <li><a href="#logout" id="logout-link">Logout</a></li>
     </ul>
 </div>
 
@@ -398,5 +395,56 @@
         });
 
         // No JS-driven hover or page-load animations to keep UI stable
+
+        // Settings modal trigger
+        const settingsLink = document.getElementById('open-settings-modal');
+        if (settingsLink) {
+            settingsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (typeof openSettingsModal === 'function') {
+                    openSettingsModal();
+                }
+            });
+        }
+
+        // Logout with confirmation modal
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const icon = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='28' height='28' fill='none' stroke='currentColor' stroke-width='1.5'><path d='M10 17l5-5-5-5'/><path d='M15 12H3'/><path d='M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4'/></svg>`;
+                if (typeof messageModalV1Show === 'function') {
+                    messageModalV1Show({
+                        icon,
+                        iconBg: '#eef2ff',
+                        actionBtnBg: '#2E7D32',
+                        showCancelBtn: true,
+                        title: 'Sign out?',
+                        message: 'Are you sure you want to logout?',
+                        cancelText: 'Cancel',
+                        actionText: 'Logout',
+                        onConfirm: async () => {
+                            try {
+                                const { ok, data } = await (window.postJSON ? window.postJSON('/api/logout.php', {}) : Promise.resolve({ ok: false, data: { success: false } }));
+                                if (ok && data && data.success) {
+                                    window.location.href = '../login';
+                                } else {
+                                    // Fallback: still redirect to login
+                                    window.location.href = '../login';
+                                }
+                            } catch (_) {
+                                window.location.href = '../login';
+                            }
+                        }
+                    });
+                } else {
+                    // If modal not available, proceed directly
+                    try {
+                        await fetch('/api/logout.php', { method: 'POST' });
+                    } catch (_) {}
+                    window.location.href = 'login';
+                }
+            });
+        }
     });
 </script>

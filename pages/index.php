@@ -20,13 +20,21 @@ include "functions/generalUploads.php";
 
     <!-- JS -->
     <script src="pages/src/js/landingNavbar.js"></script>
+    <!-- Geometric Canvas Background (yellow dots) -->
+    <script defer src="pages/src/js/geometric _bg.js"></script>
+    <!-- Announcements Carousel -->
+    <script defer src="pages/src/js/announcements.js"></script>
 
     <title>Student Service Support</title>
 </head>
 
 <body>
+
+
     <!-- ================= MAIN CONTAINER ================= -->
     <div class="main_container">
+
+        <canvas id="canvas"></canvas>
 
 
         <section class="landingpage">
@@ -68,26 +76,100 @@ include "functions/generalUploads.php";
                     </div>
                 </div>
 
-                <!-- Waves -->
+                
+
+                <!-- Waves 
                 <div class="wave_container">
-                    <!-- Green Wave -->
+                    Green Wave 
                     <div class="green">
                         <svg viewBox="0 0 500 150" preserveAspectRatio="none">
                             <path fill="var(--color-green-base)" d="M0,50 C150,150 350,-50 500,50 L500,150 L0,150 Z" />
                         </svg>
                     </div>
 
-                    <!-- Yellow Wave -->
+                    Yellow Wave 
                     <div class="yellow">
                         <svg viewBox="0 0 500 150" preserveAspectRatio="none">
                             <path fill="var(--color-yellow-base)" fill-opacity="0.85"
                                 d="M0,80 C120,160 380,0 500,80 L500,150 L0,150 Z" />
                         </svg>
                     </div>
-                </div>
+                </div>-->
             </div>
         </section>
 
+        <!-- ================= Announcements Section ================= -->
+        <section id="announcements" class="announcements_section" aria-label="Announcements">
+
+        
+            <div class="announcements_header">
+                <h2 class="announcements_title">Announcements</h2>
+                <p class="announcements_subtitle">Latest updates and important notices</p>
+            </div>
+
+            <div class="announcements_wrapper">
+
+                <div id="announcements-carousel" class="announcements_carousel" tabindex="0" aria-live="polite">
+                    <!-- Card 1 -->
+                    <article class="announcement_card" aria-label="Entrance Exam Schedule">
+                        <div class="announcement_meta">
+                            <span class="announcement_date">Nov 10, 2025</span>
+                            <span class="announcement_tag">Admissions</span>
+                        </div>
+                        <h3 class="announcement_title">Entrance Exam Schedule</h3>
+                        <p class="announcement_desc">The entrance exam for incoming freshmen is open. Register online and pick your preferred date.</p>
+                        <div class="announcement_actions">
+                            <a href="#" class="btn btn--ghost">Learn More</a>
+                        </div>
+                    </article>
+
+                    <!-- Card 2 -->
+                    <article class="announcement_card" aria-label="ID Replacement Drive">
+                        <div class="announcement_meta">
+                            <span class="announcement_date">Nov 7, 2025</span>
+                            <span class="announcement_tag">Student Services</span>
+                        </div>
+                        <h3 class="announcement_title">ID Replacement Drive</h3>
+                        <p class="announcement_desc">Lost or damaged ID? Visit the booth at the lobby this week for expedited processing.</p>
+                        <div class="announcement_actions">
+                            <a href="#services" class="btn btn--ghost">View Service</a>
+                        </div>
+                    </article>
+
+                    <!-- Card 3 -->
+                    <article class="announcement_card" aria-label="Good Moral Request Update">
+                        <div class="announcement_meta">
+                            <span class="announcement_date">Nov 4, 2025</span>
+                            <span class="announcement_tag">Registrar</span>
+                        </div>
+                        <h3 class="announcement_title">Good Moral Request Update</h3>
+                        <p class="announcement_desc">Processing time for Good Moral certificates has been reduced to 2–3 business days.</p>
+                        <div class="announcement_actions">
+                            <a href="#services" class="btn btn--ghost">See Details</a>
+                        </div>
+                    </article>
+
+                    <!-- Card 4 -->
+                    <article class="announcement_card" aria-label="System Maintenance">
+                        <div class="announcement_meta">
+                            <span class="announcement_date">Nov 1, 2025</span>
+                            <span class="announcement_tag">IT Notice</span>
+                        </div>
+                        <h3 class="announcement_title">System Maintenance</h3>
+                        <p class="announcement_desc">Scheduled maintenance on Saturday 10 PM–12 AM. Some services may be temporarily unavailable.</p>
+                        <div class="announcement_actions">
+                            <a href="#" class="btn btn--ghost">Read Notice</a>
+                        </div>
+                    </article>
+                </div>
+
+                
+
+               
+            </div>
+        </section>
+
+        
         <!-- ================= SERVICES SECTION ================= -->
         <section id="services" class="services" aria-label="Services">
             <!-- HERO AREA -->
@@ -443,6 +525,333 @@ include "functions/generalUploads.php";
         contactSection.style.backgroundPosition = "center";
         contactSection.style.backgroundRepeat = "no-repeat";
     </script>
+
+    <script>
+          function togglePassword() {
+          const passwordInput = document.getElementById('password');
+          const eyeIcon = document.getElementById('eye-icon');
+          const eyeOffIcon = document.getElementById('eye-off-icon');
+
+          if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.style.display = 'none';
+            eyeOffIcon.style.display = 'block';
+          } else {
+            passwordInput.type = 'password';
+            eyeIcon.style.display = 'block';
+            eyeOffIcon.style.display = 'none';
+          }
+        }
+
+        // ================== PARTICLE EFFECT ==================
+        // Use full viewport for canvas background on landing page
+        const rightEl = null;
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const particles = [];
+        const fireworkParticles = [];
+        const dustParticles = [];
+        const ripples = [];
+        const techRipples = [];
+
+        const mouse = (() => {
+          let state = { x: null, y: null };
+          return {
+            get x() { return state.x; },
+            get y() { return state.y; },
+            set({ x, y }) { state = { x, y }; },
+            reset() { state = { x: null, y: null }; }
+          };
+        })();
+
+        let frameCount = 0;
+        let autoDrift = true;
+
+        function adjustParticleCount() {
+          const particleConfig = {
+            heightConditions: [200, 300, 400, 500, 600],
+            widthConditions: [450, 600, 900, 1200, 1600],
+            particlesForHeight: [20, 30, 40, 50, 60],
+            particlesForWidth: [20, 30, 40, 50, 60]
+          };
+
+          let numParticles = 60;
+          for (let i = 0; i < particleConfig.heightConditions.length; i++) {
+            if (canvas.height < particleConfig.heightConditions[i]) {
+              numParticles = particleConfig.particlesForHeight[i];
+              break;
+            }
+          }
+
+          for (let i = 0; i < particleConfig.widthConditions.length; i++) {
+            if (canvas.width < particleConfig.widthConditions[i]) {
+              numParticles = Math.min(numParticles, particleConfig.particlesForWidth[i]);
+              break;
+            }
+          }
+
+          return numParticles;
+        }
+
+        class Particle {
+          constructor(x, y, isFirework = false) {
+            const baseSpeed = isFirework ? Math.random() * 2 + 1 : Math.random() * 0.5 + 0.3;
+
+            Object.assign(this, {
+              isFirework,
+              x,
+              y,
+              vx: Math.cos(Math.random() * Math.PI * 2) * baseSpeed,
+              vy: Math.sin(Math.random() * Math.PI * 2) * baseSpeed,
+              size: isFirework ? Math.random() * 1 + 1 : Math.random() * 1.5 + 0.5,
+              hue: Math.random() * 60 + 90, // soft lime green range
+              alpha: 1,
+              sizeDirection: Math.random() < 0.5 ? -1 : 1,
+              trail: []
+            });
+          }
+
+          update(mouse) {
+            const dist = mouse.x !== null ? (mouse.x - this.x) ** 2 + (mouse.y - this.y) ** 2 : 0;
+            if (!this.isFirework) {
+              const force = dist && dist < 22500 ? (22500 - dist) / 22500 : 0;
+
+              if (mouse.x === null && autoDrift) {
+                this.vx += (Math.random() - 0.5) * 0.03;
+                this.vy += (Math.random() - 0.5) * 0.03;
+              }
+
+              if (dist) {
+                const sqrtDist = Math.sqrt(dist);
+                this.vx += ((mouse.x - this.x) / sqrtDist) * force * 0.1;
+                this.vy += ((mouse.y - this.y) / sqrtDist) * force * 0.1;
+              }
+
+              this.vx *= mouse.x !== null ? 0.99 : 0.998;
+              this.vy *= mouse.y !== null ? 0.99 : 0.998;
+            } else {
+              this.alpha -= 0.02;
+            }
+
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x <= 0 || this.x >= canvas.width - 1) this.vx *= -0.9;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -0.9;
+
+            this.size += this.sizeDirection * 0.1;
+            if (this.size > 3 || this.size < 0.5) this.sizeDirection *= -1;
+
+            this.hue = (this.hue + 0.3) % 360;
+
+            if (frameCount % 2 === 0 && (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1)) {
+              this.trail.push({ x: this.x, y: this.y, hue: this.hue, alpha: this.alpha });
+              if (this.trail.length > 15) this.trail.shift();
+            }
+          }
+
+          draw(ctx) {
+            const glowColor = `hsl(${this.hue}, 90%, 60%)`;
+            const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+            gradient.addColorStop(0, `hsla(${this.hue}, 100%, 70%, ${Math.max(this.alpha, 0)})`);
+            gradient.addColorStop(1, `hsla(${this.hue}, 80%, 40%, 0)`);
+
+            ctx.fillStyle = gradient;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = glowColor;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            if (this.trail.length > 1) {
+              ctx.beginPath();
+              ctx.lineWidth = 1.5;
+              for (let i = 0; i < this.trail.length - 1; i++) {
+                const { x: x1, y: y1, hue: h1, alpha: a1 } = this.trail[i];
+                const { x: x2, y: y2 } = this.trail[i + 1];
+                ctx.strokeStyle = `hsla(${h1}, 100%, 60%, ${Math.max(a1, 0)})`;
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+              }
+              ctx.stroke();
+            }
+          }
+
+          isDead() {
+            return this.isFirework && this.alpha <= 0;
+          }
+        }
+
+        class DustParticle {
+          constructor() {
+            Object.assign(this, {
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              size: Math.random() * 1.2 + 0.3,
+              hue: Math.random() * 60 + 40, // yellow-green tint
+              vx: (Math.random() - 0.5) * 0.05,
+              vy: (Math.random() - 0.5) * 0.05
+            });
+          }
+
+          update() {
+            this.x = (this.x + this.vx + canvas.width) % canvas.width;
+            this.y = (this.y + this.vy + canvas.height) % canvas.height;
+            this.hue = (this.hue + 0.1) % 360;
+          }
+
+          draw(ctx) {
+            ctx.fillStyle = `hsla(${this.hue}, 50%, 70%, 0.25)`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        class Ripple {
+          constructor(x, y, hue = 90, maxRadius = 30) {
+            Object.assign(this, { x, y, radius: 0, maxRadius, alpha: 0.5, hue });
+          }
+
+          update() {
+            this.radius += 1.5;
+            this.alpha -= 0.01;
+            this.hue = (this.hue + 5) % 360;
+          }
+
+          draw(ctx) {
+            ctx.strokeStyle = `hsla(${this.hue}, 90%, 60%, ${this.alpha})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          isDone() {
+            return this.alpha <= 0;
+          }
+        }
+
+        function createParticles() {
+          particles.length = 0;
+          dustParticles.length = 0;
+
+          const numParticles = adjustParticleCount();
+          for (let i = 0; i < numParticles; i++) {
+            particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+          }
+          for (let i = 0; i < 80; i++) {
+            dustParticles.push(new DustParticle());
+          }
+        }
+
+        function resizeCanvas() {
+          // Size canvas to full viewport for background effect
+          canvas.width = Math.max(0, Math.floor(window.innerWidth));
+          canvas.height = Math.max(0, Math.floor(window.innerHeight));
+          createParticles();
+        }
+
+        function drawBackground() {
+          const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+          gradient.addColorStop(0, "#0A1B0A");
+          gradient.addColorStop(1, "#133D1C");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function connectParticles() {
+          const gridSize = 120;
+          const grid = new Map();
+
+          particles.forEach((p) => {
+            const key = `${Math.floor(p.x / gridSize)},${Math.floor(p.y / gridSize)}`;
+            if (!grid.has(key)) grid.set(key, []);
+            grid.get(key).push(p);
+          });
+
+          ctx.lineWidth = 1.2;
+          particles.forEach((p) => {
+            const gridX = Math.floor(p.x / gridSize);
+            const gridY = Math.floor(p.y / gridSize);
+
+            for (let dx = -1; dx <= 1; dx++) {
+              for (let dy = -1; dy <= 1; dy++) {
+                const key = `${gridX + dx},${gridY + dy}`;
+                if (grid.has(key)) {
+                  grid.get(key).forEach((neighbor) => {
+                    if (neighbor !== p) {
+                      const diffX = neighbor.x - p.x;
+                      const diffY = neighbor.y - p.y;
+                      const dist = diffX * diffX + diffY * diffY;
+                      if (dist < 10000) {
+                        ctx.strokeStyle = `rgba(0, 255, 100, ${1 - Math.sqrt(dist) / 100})`;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(neighbor.x, neighbor.y);
+                        ctx.stroke();
+                      }
+                    }
+                  });
+                }
+              }
+            }
+          });
+        }
+
+        function animate() {
+          drawBackground();
+
+          [dustParticles, particles, ripples, techRipples, fireworkParticles].forEach((arr) => {
+            for (let i = arr.length - 1; i >= 0; i--) {
+              const obj = arr[i];
+              obj.update(mouse);
+              obj.draw(ctx);
+              if (obj.isDone?.() || obj.isDead?.()) arr.splice(i, 1);
+            }
+          });
+
+          connectParticles();
+          frameCount++;
+          requestAnimationFrame(animate);
+        }
+
+        window.addEventListener("mousemove", (e) => {
+          mouse.set({ x: e.clientX, y: e.clientY });
+          techRipples.push(new Ripple(mouse.x, mouse.y));
+          autoDrift = false;
+        });
+
+        document.addEventListener("mouseleave", () => {
+          mouse.reset();
+          autoDrift = true;
+        });
+
+        window.addEventListener("click", (e) => {
+          const clickX = e.clientX;
+          const clickY = e.clientY;
+
+          ripples.push(new Ripple(clickX, clickY, 100, 60));
+
+          for (let i = 0; i < 10; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 2 + 1;
+            const particle = new Particle(clickX, clickY, true);
+            particle.vx = Math.cos(angle) * speed;
+            particle.vy = Math.sin(angle) * speed;
+            fireworkParticles.push(particle);
+          }
+        });
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+        animate();
+
+      </script>
+
+    
 </body>
 
 </html>

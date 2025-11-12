@@ -49,45 +49,43 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    // Fetch submissions for current user and include applicant type name, academic year, can_update gate, and status hex color
     $sql = "SELECT 
                 s.id AS submission_id,
-                s.applicant_type_id,
                 s.status,
+                COALESCE(st.hex_color, '#64748b') AS status_color,
                 s.remarks,
                 COALESCE(at.name, 'N/A') AS type,
-                COALESCE(c.cycle_name, 'N/A') AS academic_year,
-                COALESCE(asm.can_update, 1) AS can_update,
-                COALESCE(st.hex_color, '#64748b') AS status_color
+                CASE 
+                    WHEN c.academic_year_start IS NOT NULL AND c.academic_year_end IS NOT NULL
+                        THEN CONCAT(c.academic_year_start, '-', c.academic_year_end)
+                    WHEN c.academic_year_start IS NOT NULL
+                        THEN CAST(c.academic_year_start AS CHAR)
+                    ELSE 'N/A'
+                END AS academic_year,
+                s.can_update,
+                DATE_FORMAT(s.submitted_at, '%Y-%m-%d %H:%i:%s') AS submitted_at
             FROM submissions s
-            LEFT JOIN applicant_types at 
-                ON at.id = s.applicant_type_id AND at.is_active = 1
-            LEFT JOIN admission_cycles c 
-                ON c.id = at.admission_cycle_id
-            LEFT JOIN admission_submission asm
-                ON asm.user_id = s.user_id
-            LEFT JOIN statuses st
-                ON st.name = s.status
+            LEFT JOIN applicant_types at ON at.id = s.applicant_type_id
+            LEFT JOIN admission_cycles c ON c.id = at.admission_cycle_id
+            LEFT JOIN statuses st ON st.name = s.status
             WHERE s.user_id = ?
-            ORDER BY s.id DESC";
+            ORDER BY s.submitted_at DESC";
 
-    $types = "i";
-    $params = [$ACCOUNT_ID];
-    $result = executeSelect($conn, $sql, $types, $params);
+    $result = executeSelect($conn, $sql, "i", [$ACCOUNT_ID]);
 
     if (!$result['success']) {
+        http_response_code(500);
         echo json_encode([
             "success" => false,
-            "message" => "Error fetching applications",
-            "data" => []
+            "message" => $result['message'] ?? 'Failed to fetch applications'
         ]);
         exit;
     }
 
     echo json_encode([
         "success" => true,
-        "data" => $result['data'],
-        "message" => "Submissions fetched successfully"
+        "data" => $result['data'] ?? [],
+        "message" => "Applications fetched successfully"
     ]);
 } catch (Exception $e) {
     error_log("Error in get_my_applications.php: " . $e->getMessage());
@@ -99,4 +97,3 @@ try {
 }
 
 $conn->close();
-?>
