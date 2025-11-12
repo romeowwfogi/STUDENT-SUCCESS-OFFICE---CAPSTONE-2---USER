@@ -9,3 +9,10 @@
 [2025-11-11 11:16:52 Asia/Manila] Validating session in tokenization: result_success=yes rows=1
 [2025-11-11 11:16:52 Asia/Manila] Inserting user_fullname for user_id=5
 [2025-11-11 11:16:53 Asia/Manila] Profile set success; committed for user_id=5
+[2025-11-12 07:21:45 Asia/Manila] set_profile invoked
+[2025-11-12 07:21:45 Asia/Manila] Session token present: yes
+[2025-11-12 14:21:47 Asia/Manila] Input parsed FN=Kishiel LN=Hernandez MN=N SFX=N
+[2025-11-12 14:21:48 Asia/Manila] Decoded session token present: yes account_id: 11
+[2025-11-12 14:21:48 Asia/Manila] Validating session in tokenization: result_success=yes rows=1
+[2025-11-12 14:21:49 Asia/Manila] Inserting user_fullname for user_id=11
+[2025-11-12 14:21:49 Asia/Manila] Profile set success; committed for user_id=11

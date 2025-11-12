@@ -1,2 +1,4 @@
 [2025-11-12 12:47:06] get_profile.php - Server error: Call to undefined function getConfigValue()
 [2025-11-12 12:47:28] get_profile.php - Server error: Call to undefined function getConfigValue()
+[12-Nov-2025 14:17:54 Asia/Manila] 🚀 Error logging test triggered at 2025-11-12 14:17:54
+[12-Nov-2025 14:21:46 Asia/Manila] 🚀 Error logging test triggered at 2025-11-12 14:21:46
