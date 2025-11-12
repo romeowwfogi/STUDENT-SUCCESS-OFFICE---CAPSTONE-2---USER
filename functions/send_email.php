@@ -12,13 +12,14 @@ function sendEmail($receiver, $subject, $body)
     $mail = new PHPMailer(true);
 
     try {
+        
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'plpasig.sso@gmail.com';
         $mail->Password   = 'npla ugmc iafq mvaf';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port       = 465;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
 
         $mail->setFrom('plpasig.sso@gmail.com', 'Pamantasan ng Lungsod ng Pasig - Student Success Office');
         $mail->addAddress($receiver);
