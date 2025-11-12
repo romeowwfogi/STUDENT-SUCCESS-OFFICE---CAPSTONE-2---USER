@@ -1004,6 +1004,7 @@ function e($string)
 </head>
 
 <body>
+    <?php include "includes/loader.php"; ?>
     <!-- Particles Background -->
     <div class="bg">
         <canvas id="canvas"></canvas>
@@ -1315,6 +1316,13 @@ function e($string)
                 }
 
                 currentStep = stepIndex;
+
+                // Re-evaluate trigger-based visibility when step changes
+                try {
+                    if (typeof applyTriggers === 'function') {
+                        applyTriggers();
+                    }
+                } catch (e) {}
             }
 
             function validateStep(stepIndex) {
@@ -1440,24 +1448,58 @@ function e($string)
                 var fieldName = container.getAttribute('data-trigger-field');
                 var triggerValue = container.getAttribute('data-trigger-value');
                 var control = document.getElementById(fieldName);
-                var controlsByName = document.querySelectorAll('[name="' + fieldName + '"]');
+                // Support checkbox groups that use name="fieldName[]" as well as plain name="fieldName"
+                var controlsByName = document.querySelectorAll('[name="' + fieldName + '"], [name="' + fieldName + '[]"]');
                 var hasAnyControl = control || controlsByName.length > 0;
                 if (!hasAnyControl) return;
 
+                // Helper to enable/disable inputs inside this container when visibility changes
+                function setChildrenDisabledState(disabled) {
+                    var childControls = container.querySelectorAll('input, select, textarea');
+                    childControls.forEach(function(el) {
+                        el.disabled = disabled;
+                        if (disabled) {
+                            // Preserve original required state and remove it while hidden
+                            if (el.required && !el.dataset.originalRequired) {
+                                el.dataset.originalRequired = 'true';
+                            }
+                            el.required = false;
+                        } else {
+                            // Restore required state if it was originally required
+                            if (el.dataset.originalRequired === 'true') {
+                                el.required = true;
+                            }
+                        }
+                    });
+                }
+
                 var evaluate = function() {
                     var match = false;
+                    var tVal = (triggerValue || '').trim();
+                    var tVals = tVal ? tVal.split(/[|,]/).map(function(s) {
+                        return s.trim();
+                    }).filter(function(s) {
+                        return s.length > 0;
+                    }) : [];
                     // If there are radios/checkboxes with the same name, evaluate the group
                     if (controlsByName.length > 1 && controlsByName[0].type === 'radio') {
                         var selected = document.querySelector('input[name="' + fieldName + '"]:checked');
-                        match = selected ? (selected.value === triggerValue) : false;
+                        if (selected) {
+                            var v = (selected.value || '').trim();
+                            match = tVals.length ? tVals.indexOf(v) !== -1 : true; // any selection matches when no specific value
+                        } else {
+                            match = false;
+                        }
                     } else if (controlsByName.length > 1 && controlsByName[0].type === 'checkbox') {
-                        var tv = (triggerValue || '').trim();
+                        var tv = tVal;
                         var anyChecked = Array.from(controlsByName).some(function(cb) {
                             return cb.checked;
                         });
                         if (tv) {
                             match = Array.from(controlsByName).some(function(cb) {
-                                return cb.checked && (cb.value === tv);
+                                if (!cb.checked) return false;
+                                var v = (cb.value || '').trim();
+                                return tVals.length ? (tVals.indexOf(v) !== -1) : (v === tv);
                             });
                         } else {
                             match = anyChecked; // show when any is checked if no specific value
@@ -1467,19 +1509,43 @@ function e($string)
                         var c = control || controlsByName[0];
                         if (!c) {
                             container.style.display = 'none';
+                            setChildrenDisabledState(true);
                             return;
                         }
                         if (c.type === 'checkbox') {
-                            var truthy = (triggerValue || 'true').toLowerCase();
-                            match = c.checked ? truthy !== 'false' : truthy === 'false';
+                            var tvLower = tVal.toLowerCase();
+                            if (tvLower === '' || tvLower === 'true' || tvLower === '1') {
+                                match = c.checked;
+                            } else if (tvLower === 'false' || tvLower === '0') {
+                                match = !c.checked;
+                            } else {
+                                // Compare against checkbox value if a specific value is provided
+                                var v = (String(c.value || '')).trim();
+                                match = c.checked && (tVals.length ? (tVals.indexOf(v) !== -1) : (v === tVal));
+                            }
                         } else if (c.type === 'radio') {
                             var selected2 = document.querySelector('input[name="' + fieldName + '"]:checked');
-                            match = selected2 ? (selected2.value === triggerValue) : false;
+                            if (selected2) {
+                                var v2 = (selected2.value || '').trim();
+                                match = tVals.length ? (tVals.indexOf(v2) !== -1) : true; // any selection matches when no specific value
+                            } else {
+                                match = false;
+                            }
                         } else {
-                            match = (c.value === triggerValue);
+                            var v3 = (String(c.value || '')).trim();
+                            if (tVals.length) {
+                                match = tVals.indexOf(v3) !== -1;
+                            } else {
+                                if (c.tagName === 'SELECT') {
+                                    match = (c.selectedIndex > 0) && v3 !== '';
+                                } else {
+                                    match = v3 !== '';
+                                }
+                            }
                         }
                     }
                     container.style.display = match ? '' : 'none';
+                    setChildrenDisabledState(!match);
                 };
 
                 // Attach listeners to all relevant controls so hiding works when unselecting/changing
@@ -1555,8 +1621,23 @@ function e($string)
             var form = document.getElementById('multiStepForm');
             if (form) {
                 form.addEventListener('submit', function(e) {
+                    // Block submission when file validation fails
                     if (!validateAllFiles()) {
                         e.preventDefault();
+                        return;
+                    }
+                    // Show global loader and disable submit to prevent double submissions
+                    try {
+                        var submitBtnEl = document.getElementById('submitBtn');
+                        if (submitBtnEl) {
+                            submitBtnEl.setAttribute('data-loading', 'true');
+                            submitBtnEl.disabled = true;
+                        }
+                        if (typeof showLoader === 'function') {
+                            showLoader();
+                        }
+                    } catch (err) {
+                        // no-op
                     }
                 });
             }

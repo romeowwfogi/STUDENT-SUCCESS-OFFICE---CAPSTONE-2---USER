@@ -26,7 +26,11 @@ document.addEventListener('DOMContentLoaded', function () {
     navLinks.forEach(link => {
         link.addEventListener('click', function (e) {
             e.preventDefault();
-            const targetId = this.getAttribute('href');
+            const targetId = (this.getAttribute('href') || '').trim();
+            // Guard against bare '#', which is not a valid selector
+            if (!targetId || targetId === '#') {
+                return; // do nothing for placeholder links
+            }
             const targetElement = document.querySelector(targetId);
 
             if (targetElement) {

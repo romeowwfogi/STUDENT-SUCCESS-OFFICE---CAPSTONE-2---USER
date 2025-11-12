@@ -368,14 +368,16 @@
             });
         });
 
-        // Smooth scrolling for navigation links
+        // Smooth scrolling for navigation links (ignore bare '#')
         const navLinks = document.querySelectorAll('a[href^="#"]');
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
+                const targetId = (this.getAttribute('href') || '').trim();
+                if (!targetId || targetId === '#') {
+                    return; // skip placeholder hash links like Settings
+                }
                 const targetElement = document.querySelector(targetId);
-
                 if (targetElement) {
                     targetElement.scrollIntoView({
                         behavior: 'smooth',
@@ -425,7 +427,8 @@
                         actionText: 'Logout',
                         onConfirm: async () => {
                             try {
-                                const { ok, data } = await (window.postJSON ? window.postJSON('/api/logout.php', {}) : Promise.resolve({ ok: false, data: { success: false } }));
+                                const logoutUrl = new URL('../api/logout.php', window.location.href).href;
+                                const { ok, data } = await (window.postJSON ? window.postJSON(logoutUrl, {}) : Promise.resolve({ ok: false, data: { success: false } }));
                                 if (ok && data && data.success) {
                                     window.location.href = '../login';
                                 } else {
@@ -440,7 +443,8 @@
                 } else {
                     // If modal not available, proceed directly
                     try {
-                        await fetch('/api/logout.php', { method: 'POST' });
+                        const logoutUrl = new URL('../api/logout.php', window.location.href).href;
+                        await fetch(logoutUrl, { method: 'POST' });
                     } catch (_) {}
                     window.location.href = 'login';
                 }

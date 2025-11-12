@@ -12,7 +12,7 @@ function sendEmail($receiver, $subject, $body)
     $mail = new PHPMailer(true);
 
     try {
-        
+
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;

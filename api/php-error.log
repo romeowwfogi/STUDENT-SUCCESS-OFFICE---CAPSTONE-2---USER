@@ -2,3 +2,5 @@
 [2025-11-12 12:47:28] get_profile.php - Server error: Call to undefined function getConfigValue()
 [12-Nov-2025 14:17:54 Asia/Manila] 🚀 Error logging test triggered at 2025-11-12 14:17:54
 [12-Nov-2025 14:21:46 Asia/Manila] 🚀 Error logging test triggered at 2025-11-12 14:21:46
+[12-Nov-2025 23:45:48 Asia/Manila] Applicant number lookup error: Table 'u337253893_PLPasigSSO.applicant_number' doesn't exist
+[12-Nov-2025 23:46:21 Asia/Manila] Applicant number lookup error: Table 'u337253893_PLPasigSSO.applicant_number' doesn't exist
